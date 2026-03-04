@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+   <t t-name="custom_pos_screen.FiscalIntegrationScreen">
+       <div class="screen h-100 bg-100">
+           <div>
+                <button class="new-order btn btn-primary btn-lg lh-lg my-2"
+                        t-on-click="() => this.closePosIntegrationScreen()">
+                   BACK
+               </button>
+           </div>
+           <div class="content">
+               <div class="custom-message screen-full-width d-flex w-100 h-100">
+                   <h1>POS Fiscal integration actions</h1>
+               </div>
+                <div>
+                <button class="pos-fiscal-x-report btn btn-primary btn-lg lh-lg pos-x-report"
+                        t-on-click="() => this.xReport()">
+                   Print X Report
+               </button>
+           </div>
+           </div>
+       </div>
+   </t>
+</templates>

@@ -1,0 +1,1 @@
+from . import pos_fiscal_integration_conf, pos_fiscal_order
