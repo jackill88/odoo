@@ -1,0 +1,83 @@
+<odoo>
+
+    <record id="animal_list_view" model="ir.ui.view">
+        <field name="name">animal.list</field>
+        <field name="model">animal</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="animal_type_id"/>
+                <field name="customer_id"/>
+                <field name="age"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="animal_form_view" model="ir.ui.view">
+        <field name="name">animal.form</field>
+        <field name="model">animal</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="animal_type_id"/>
+                        <field name="customer_id"/>
+                        <field name="birth_date"/>
+                        <field name="age"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="animal_action" model="ir.actions.act_window">
+        <field name="name">Animals</field>
+        <field name="res_model">animal</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="animal_examination_list_view" model="ir.ui.view">
+        <field name="name">animal.examination.list</field>
+        <field name="model">animal.examination</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="date"/>
+                <field name="animal_id"/>
+                <field name="examination_file_ids"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="animal_examination_form_view" model="ir.ui.view">
+        <field name="name">animal.examination.form</field>
+        <field name="model">animal.examination</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="animal_id"/>
+                        <field name="date"/>
+                    </group>
+                    <notebook>
+                        <page string="Files">
+                            <field name="examination_file_ids">
+                                <list>
+                                    <field name="file"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="animal_examination_action" model="ir.actions.act_window">
+        <field name="name">Animal Examinations</field>
+        <field name="res_model">animal.examination</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="animal_examination_list_view"/>
+    </record>
+
+</odoo>

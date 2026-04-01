@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-inherit="point_of_sale.PosPaymentProviderCards" t-inherit-mode="extension">
+        <xpath expr="//div[@t-att-class]" position="attributes">
+            <attribute name="t-att-class">
+                this.env.inDialog
+                    ? 'col-12'
+                    : provider.selection === 'bpos1'
+                    ? 'col-12'
+                    : 'col-5 col-xl-5 col-xxl-4'
+            </attribute>
+        </xpath>
+        <xpath expr="//img[@class='img']" position="attributes">
+            <attribute name="t-att-src">
+                provider.selection === 'bpos1'
+                    ? '/pos_payment_bpos1/static/src/img/providers/bpos1.svg'
+                    : `/point_of_sale/static/img/providers/${provider.selection}.png`
+            </attribute>
+        </xpath>
+    </t>
+</templates>

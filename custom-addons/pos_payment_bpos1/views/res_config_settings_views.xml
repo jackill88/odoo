@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_pos_payment_bpos1" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.pos_payment_bpos1</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_payment_terminals_section']" position="inside">
+                <setting id="pos_payment_bpos1_setting"
+                         string="BPOS1 Terminal"
+                         help="Install and configure the BPOS1 payment terminal integration.">
+                    <field name="module_pos_payment_bpos1"/>
+                    <button name="open_payment_method_form"
+                            icon="oi-arrow-right"
+                            type="object"
+                            string="Payment method"
+                            class="btn-link"
+                            context="{'selection': 'bpos1', 'config_ids': [pos_config_id], 'provider_name': 'BPOS1 Terminal'}"
+                            invisible="not module_pos_payment_bpos1"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

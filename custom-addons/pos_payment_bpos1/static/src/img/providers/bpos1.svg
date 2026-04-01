@@ -1,0 +1,14 @@
+<svg width="96" height="96" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bpos1Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b5ed7"/>
+      <stop offset="100%" stop-color="#6610f2"/>
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="20" fill="url(#bpos1Gradient)"/>
+  <path d="M29 33h14c3.7 0 6.5 2.8 6.5 6.5s-2.8 6.5-6.5 6.5H34v12h-5V33zm5.5 10.5h8.5c1.9 0 3.5-1.6 3.5-3.5S43.4 36.5 41.5 36.5H34v7z"
+        fill="#fff"/>
+  <path d="M54 54c2.5 0 4.5-2 4.5-4.5S56.5 45 54 45s-4.5 2-4.5 4.5S51.5 54 54 54zm0-4c.8 0 1.5.7 1.5 1.5S54.8 53 54 53s-1.5-.7-1.5-1.5S53.2 50 54 50z"
+        fill="#fff"/>
+  <circle cx="64" cy="35" r="3" fill="#fff"/>
+</svg>
