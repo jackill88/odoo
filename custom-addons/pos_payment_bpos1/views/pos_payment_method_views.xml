@@ -6,8 +6,7 @@
         <field name="inherit_id" ref="point_of_sale.pos_payment_method_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//widget[@name='pos_payment_provider_cards']" position="after">
-                <group class="o_wide_form" colspan="12"
-                       modifiers="{'invisible': [('use_payment_terminal', '!=', 'bpos1')]}">
+                <group class="o_wide_form" colspan="12" invisible="use_payment_terminal != 'bpos1'">
                     <notebook>
                         <page string="BPOS1" groups="base.group_system">
                             <group>

@@ -4,7 +4,8 @@ import logging
 from urllib.parse import urljoin
 
 import requests
-from odoo import fields, models, _
+from odoo import api, fields, models, _
+from odoo.fields import Domain
 from odoo.exceptions import AccessError, UserError
 
 _logger = logging.getLogger(__name__)
@@ -35,6 +36,16 @@ class PosPaymentMethod(models.Model):
         fields_list = super()._load_pos_data_fields(config)
         fields_list += ['bpos1_api_url', 'bpos1_api_key', 'bpos1_merchant_idx']
         return fields_list
+
+    @api.model
+    def _load_pos_self_data_domain(self, data, config):
+        domain = super()._load_pos_self_data_domain(data, config)
+        if config.self_ordering_mode == 'kiosk':
+            domain = Domain.OR([
+                [('use_payment_terminal', '=', 'bpos1'), ('id', 'in', config.payment_method_ids.ids)],
+                domain,
+            ])
+        return domain
 
     def bpos1_send_payment_request(self, payload):
         self.ensure_one()

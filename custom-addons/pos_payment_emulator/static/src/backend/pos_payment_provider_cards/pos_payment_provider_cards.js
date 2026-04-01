@@ -22,6 +22,7 @@ export class PosPaymentProviderCards extends Component {
         });
 
         onWillStart(async () => {
+            const providers = getProviders();
             const res = await this.orm.call("pos.payment.method", "get_provider_status", [
                 providers.map((p) => p[1]),
             ]);
@@ -77,7 +78,7 @@ export class PosPaymentProviderCards extends Component {
 }
 
 // Selection, module_name, friendly name
-const providers = [
+const DEFAULT_PROVIDERS = [
     ["ingenico", "pos_iot_ingenico", "Ingenico"],
     ["six_iot", "pos_iot_six", "SIX"],
     ["adyen", "pos_adyen", "Adyen"],
@@ -94,12 +95,17 @@ const providers = [
     ["emulator", "pos_payment_emulator", "Terminal Emulator"],
 ];
 
+PosPaymentProviderCards.providers = DEFAULT_PROVIDERS;
+
+export function getProviders() {
+    PosPaymentProviderCards.providers = PosPaymentProviderCards.providers || [];
+    return PosPaymentProviderCards.providers;
+}
+
 export const PosPaymentProviderCardsParams = {
     component: PosPaymentProviderCards,
 };
 
-// Replace the original widget with an extended providers list.
 registry
     .category("view_widgets")
     .add("pos_payment_provider_cards", PosPaymentProviderCardsParams, { force: true });
-
