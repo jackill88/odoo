@@ -47,6 +47,11 @@ class PosPaymentMethod(models.Model):
             ])
         return domain
 
+    def _payment_request_from_kiosk(self, order):
+        if self.use_payment_terminal != 'bpos1':
+            return super()._payment_request_from_kiosk(order)
+        return 'Success'
+
     def bpos1_send_payment_request(self, payload):
         self.ensure_one()
         self._ensure_pos_user()
