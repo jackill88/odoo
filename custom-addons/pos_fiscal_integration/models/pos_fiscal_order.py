@@ -73,10 +73,31 @@ class PosOrder(models.Model):
             "RRN": "",
             "IssuerName": "",
             "PAN": "",
+            "EntryMode": "",
+            "EMVAID": "",
+            "PaymentSystemInfo": "",
             "TransactionDate": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),
             "AcquireName": "",
             "InvoiceNumber": self.pos_reference or "",
         }
+
+        terminal_payments = self.payment_ids.filtered(
+            lambda pay: pay.payment_method_id.use_payment_terminal == 'bpos1'
+        )
+        if terminal_payments:
+            terminal = terminal_payments[0]
+            entry_mode = terminal.bpos1_terminal_entry_mode or ""
+            emv_aid = terminal.bpos1_terminal_emv_aid or ""
+            payload.update({
+                "TerminalID": terminal.bpos1_terminal_id or "",
+                "ApprovalCode": terminal.bpos1_terminal_auth_code or "",
+                "RRN": terminal.transaction_id or "",
+                "PAN": terminal.bpos1_terminal_pan or "",
+                "EntryMode": entry_mode,
+                "EMVAID": emv_aid,
+                "PaymentSystemInfo": emv_aid if entry_mode in ("2", "3") else "",
+                "IssuerName": terminal.bpos1_terminal_payment_system or "",
+            })
 
         if self.partner_id.email:
             payload["CustomerEmail"] = self.partner_id.email

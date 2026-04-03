@@ -8,12 +8,10 @@
             <xpath expr="//widget[@name='pos_payment_provider_cards']" position="after">
                 <group class="o_wide_form" colspan="12" invisible="use_payment_terminal != 'bpos1'">
                     <notebook>
-                        <page string="BPOS1" groups="base.group_system">
-                            <group>
-                                <field name="bpos1_api_url"/>
-                                <field name="bpos1_api_key" password="True"/>
-                                <field name="bpos1_merchant_idx"/>
-                            </group>
+                        <page string="BPOS1">
+                            <div class="o_form_label">
+                                BPOS1 terminal connection is configured at Point of Sale settings (Fiscal Service Integration).
+                            </div>
                         </page>
                     </notebook>
                 </group>

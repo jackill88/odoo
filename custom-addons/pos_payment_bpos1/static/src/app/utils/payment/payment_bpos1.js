@@ -7,6 +7,10 @@ import { register_payment_method } from '@point_of_sale/app/services/pos_store';
 
 const RRN_KEYS = ['rrn', 'RRN', 'referenceNumber', 'reference_number', 'terminal_rrn'];
 
+function getTerminalData(response) {
+    return response?.result ?? response ?? {};
+}
+
 export class PaymentBpos1 extends PaymentInterface {
     async sendPaymentRequest(uuid) {
         const line = this.pos.getOrder().getPaymentlineByUuid(uuid);
@@ -34,8 +38,9 @@ export class PaymentBpos1 extends PaymentInterface {
 
     _buildPayload(line, isRefund) {
         const decimals = this.pos.currency.decimal_places ?? 2;
+        const amount = Math.abs(Math.round(line.amount * 100));
         return {
-            amount: Math.abs(line.amount*100),
+            amount: amount,
             amount_minor: 0,
             currency_decimals: decimals,
             ...(isRefund ? this._refundPayloadExtra(line) : {}),
@@ -43,24 +48,24 @@ export class PaymentBpos1 extends PaymentInterface {
     }
 
     _refundPayloadExtra(line) {
-        const rrn =
-            line.uiState?.bpos1_rrn || line.transaction_id || line.payment_ref_no || line.name;
+        const rrn = line.uiState?.bpos1_rrn || line.transaction_id || line.payment_ref_no || line.name;
         return rrn ? { original_rrn: rrn } : {};
     }
 
     async _callTerminal(endpoint, payload) {
-        const apiUrl = this.payment_method_id.bpos1_api_url?.trim();
-        const apiKey = this.payment_method_id.bpos1_api_key?.trim();
-        const merchantIdx = this.payment_method_id.bpos1_merchant_idx;
+        const host = this.pos.config.fiscal_service_ip?.trim();
+        const port = this.pos.config.fiscal_service_port;
+        const apiKey = this.pos.config.pos_fiscal_service_api_key?.trim();
+        const merchantIdx = this.pos.config.bpos1_merchant_idx;
 
-        if (!apiUrl) {
-            throw new Error(_t('The BPOS1 API base URL is not configured.'));
+        if (!host || !port) {
+            throw new Error(_t('Fiscal service IP/port is not configured on the POS settings.'));
         }
         if (!apiKey) {
-            throw new Error(_t('The BPOS1 API key is required.'));
+            throw new Error(_t('Fiscal service API key is not configured on the POS settings.'));
         }
 
-        const normalizedUrl = `${apiUrl.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`;
+        const normalizedUrl = `http://${host}:${port}/${endpoint.replace(/^\/+/, '')}`;
         const headers = {
             'Content-Type': 'application/json',
             'x-api-key': apiKey,
@@ -94,7 +99,8 @@ export class PaymentBpos1 extends PaymentInterface {
     }
 
     _handleSuccess(line, response) {
-        const rrn = this._extractRrn(response);
+        const terminalData = getTerminalData(response);
+        const rrn = this._extractRrn(terminalData);
         if (rrn) {
             line.transaction_id = rrn;
             line.uiState = {
@@ -102,6 +108,15 @@ export class PaymentBpos1 extends PaymentInterface {
                 bpos1_rrn: rrn,
             };
         }
+        line.bpos1_terminal_id = terminalData?.terminal_id || '';
+        line.bpos1_terminal_auth_code = terminalData?.auth_code || '';
+        line.bpos1_terminal_pan = terminalData?.pan || '';
+        const entryMode = terminalData?.entry_mode ?? terminalData?.EntryMode ?? '';
+        line.bpos1_terminal_entry_mode = entryMode ? entryMode.toString() : '';
+        const emvAid = terminalData?.emvAID ?? terminalData?.EMVAID ?? '';
+        line.bpos1_terminal_emv_aid =
+            ['2', '3'].includes(line.bpos1_terminal_entry_mode) ? emvAid : '';
+        line.bpos1_terminal_payment_system = terminalData?.payment_system ?? terminalData?.paymentSystem ?? '';
         line.setPaymentStatus('done');
     }
 

@@ -46,16 +46,17 @@ const extractBpos1Rrn = (response) => {
     return null;
 };
 
-const callBpos1Terminal = async (method, paymentMethod, order) => {
-    const apiUrl = paymentMethod.bpos1_api_url?.trim();
-    const apiKey = paymentMethod.bpos1_api_key?.trim();
-    const merchantIdx = paymentMethod.bpos1_merchant_idx;
+const callBpos1Terminal = async (method, config, order) => {
+    const host = config.fiscal_service_ip?.trim();
+    const port = config.fiscal_service_port;
+    const apiKey = config.pos_fiscal_service_api_key?.trim();
+    const merchantIdx = config.bpos1_merchant_idx;
 
-    if (!apiUrl) {
-        throw new Error("BPOS1 API URL is missing on the payment method");
+    if (!host || !port) {
+        throw new Error("Fiscal service IP/port is not configured on POS settings");
     }
     if (!apiKey) {
-        throw new Error("BPOS1 API key is missing on the payment method");
+        throw new Error("Fiscal service API key is not configured on POS settings");
     }
 
     const decimals = order.currency_id?.decimal_places ?? 2;
@@ -65,7 +66,7 @@ const callBpos1Terminal = async (method, paymentMethod, order) => {
     }
 
     const response = await fetchWithTimeout(
-        formatBpos1Url(apiUrl, method),
+        formatBpos1Url(`http://${host}:${port}`, method),
         {
             method: "POST",
             headers: {
@@ -136,7 +137,7 @@ patch(PaymentPage.prototype, {
         if (paymentMethod?.use_payment_terminal === "bpos1") {
             try {
                 const endpoint = currentOrder.amount_total < 0 ? "/terminal-refund" : "/terminal-pay";
-                const response = await callBpos1Terminal(endpoint, paymentMethod, currentOrder);
+                const response = await callBpos1Terminal(endpoint, config, currentOrder);
                 terminalRrn = extractBpos1Rrn(response);
             } catch (error) {
                 this.selfOrder.handleErrorNotification(error);

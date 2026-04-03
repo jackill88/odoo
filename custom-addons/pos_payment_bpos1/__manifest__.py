@@ -3,9 +3,10 @@
     'version': '1.0',
     'category': 'Sales/Point of Sale',
     'summary': 'Connect Point of Sale to a BPOS1 terminal via the fiscal layer endpoints.',
-    'depends': ['point_of_sale', 'pos_payment_emulator'],
+    'depends': ['point_of_sale', 'pos_payment_emulator', 'pos_fiscal_integration'],
     'data': [
         'views/pos_payment_method_views.xml',
+        'views/pos_config_views.xml',
         'views/res_config_settings_views.xml',
     ],
     'assets': {

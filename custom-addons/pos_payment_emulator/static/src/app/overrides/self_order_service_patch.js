@@ -17,12 +17,12 @@ patch(SelfOrder.prototype, {
             return methods;
         }
 
-        const emulatorMethods = pms.filter(
-            (rec) => rec.use_payment_terminal === "emulator"
+        const terminalMethods = pms.filter((rec) =>
+            ["emulator", "bpos1"].includes(rec.use_payment_terminal)
         );
         const existingIds = new Set(methods.map((m) => m.id));
 
-        for (const pm of emulatorMethods) {
+        for (const pm of terminalMethods) {
             if (!existingIds.has(pm.id)) {
                 methods.push(pm);
             }
@@ -31,4 +31,3 @@ patch(SelfOrder.prototype, {
         return methods;
     },
 });
-
