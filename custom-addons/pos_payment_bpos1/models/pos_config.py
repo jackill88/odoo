@@ -11,8 +11,24 @@ class PosConfig(models.Model):
         help='Optional merchant index sent to the payment terminal as merchant_idx.',
     )
 
+    def _load_pos_data_fields(self, config):
+        fields_list = super()._load_pos_data_fields(config)
+        for field_name in ('currency_id', 'company_id', 'use_pricelist'):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
+        return fields_list
+
     def _load_pos_self_data_fields(self, config):
         fields_list = super()._load_pos_self_data_fields(config)
-        if 'bpos1_merchant_idx' not in fields_list:
-            fields_list.append('bpos1_merchant_idx')
+        for field_name in (
+            'access_token',
+            'self_ordering_mode',
+            'iface_available_categ_ids',
+            'self_ordering_available_language_ids',
+            'currency_id',
+            'company_id',
+            'bpos1_merchant_idx',
+        ):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
         return fields_list
