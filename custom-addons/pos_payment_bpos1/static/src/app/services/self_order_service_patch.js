@@ -23,10 +23,13 @@ patch(SelfOrder.prototype, {
         return result;
     },
 
-    filterPaymentMethods(pms) {
-        const list = Array.isArray(pms) ? pms : [];
-        return this.config.self_ordering_mode === 'kiosk'
-            ? list.filter((rec) => ['adyen', 'stripe'].includes(rec.use_payment_terminal))
-            : [];
+    hasPaymentMethod() {
+        if (this.config.self_ordering_mode !== 'kiosk') {
+            return super.hasPaymentMethod?.() ?? true;
+        }
+        const terminalWhitelist = new Set(['adyen', 'stripe', 'emulator', 'bpos1']);
+        return this.models['pos.payment.method']
+            .getAll()
+            .some((rec) => terminalWhitelist.has(rec.use_payment_terminal));
     },
 });

@@ -31,4 +31,7 @@ class PosConfig(models.Model):
         ):
             if field_name not in fields_list:
                 fields_list.append(field_name)
+        for field_name in ('payment_method_ids', 'self_order_online_payment_method_id'):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
         return fields_list

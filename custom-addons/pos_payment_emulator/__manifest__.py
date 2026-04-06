@@ -3,7 +3,7 @@
     'version': '1.0',
     'category': 'Sales/Point of Sale',
     'summary': 'Simulated POS payment terminal for testing and demos',
-    'depends': ['point_of_sale', 'pos_self_order'],
+    'depends': ['point_of_sale', 'pos_self_order', 'pos_self_order_terminal_registry'],
     'data': [
         'views/pos_payment_method_views.xml',
         'views/res_config_settings_views.xml',
