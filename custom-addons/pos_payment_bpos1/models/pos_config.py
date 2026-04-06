@@ -35,3 +35,10 @@ class PosConfig(models.Model):
             if field_name not in fields_list:
                 fields_list.append(field_name)
         return fields_list
+    
+    def _loader_params_pos_config(self):
+        res = super()._loader_params_pos_config()
+        fields = res['search_params']['fields']
+        if 'self_ordering_mode' not in fields:
+            fields.append('self_ordering_mode')
+        return res

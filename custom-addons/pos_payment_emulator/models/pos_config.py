@@ -10,4 +10,11 @@ class PosConfig(models.Model):
         if 'emulator' not in terminals:
             terminals.append('emulator')
         return terminals
+    
+    def _loader_params_pos_config(self):
+        res = super()._loader_params_pos_config()
+        fields = res['search_params']['fields']
+        if 'self_ordering_mode' not in fields:
+            fields.append('self_ordering_mode')
+        return res
 

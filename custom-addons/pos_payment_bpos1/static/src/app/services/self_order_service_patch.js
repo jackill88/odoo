@@ -24,7 +24,7 @@ patch(SelfOrder.prototype, {
     },
 
     hasPaymentMethod() {
-        if (this.config.self_ordering_mode !== 'kiosk') {
+        if (this.config._self_order_pos !== true) {
             return super.hasPaymentMethod?.() ?? true;
         }
         const terminalWhitelist = new Set(['adyen', 'stripe', 'emulator', 'bpos1']);
