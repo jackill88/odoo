@@ -7,9 +7,28 @@ import { logPosMessage } from "@point_of_sale/app/utils/pretty_console_log";
 
 const CONSOLE_COLOR = "#F5B427";
 const HEALTH_TIMEOUT_MS = 5000;
-const BPOS1_TIMEOUT_MS = 15000;
+const BPOS1_TIMEOUT_MS = 86400000;
+const IN_PROGRESS_STATUSES = new Set(["pending", "processing", "created", "queued"]);
+const FAILED_STATUSES = new Set([
+    "failed",
+    "declined",
+    "cancelled",
+    "canceled",
+    "rejected",
+    "error",
+    "aborted",
+    "timeout",
+    "denied",
+]);
 const RRN_KEYS = ['rrn', 'RRN', 'referenceNumber', 'reference_number', 'terminal_rrn'];
-
+const generateIdempotencyKey = () => {
+    return "bd5683bc-1f4a-4bab-a2fe-e3a027bb1ed4";
+    // const cryptoImpl = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
+    // if (cryptoImpl && typeof cryptoImpl.randomUUID === 'function') {
+    //     return cryptoImpl.randomUUID();
+    // }
+    // return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+};
 const fetchWithTimeout = async (url, options, timeoutMs = HEALTH_TIMEOUT_MS) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -34,13 +53,19 @@ const buildBpos1Payload = (order, decimals) => {
     };
 };
 
+const normalizeBpos1Response = (response) => {
+    const firstLevel = response?.result ?? response ?? {};
+    return firstLevel?.result ?? firstLevel;
+};
+
 const extractBpos1Rrn = (response) => {
-    if (!response) {
+    const terminalData = normalizeBpos1Response(response);
+    if (!terminalData) {
         return null;
     }
     for (const key of RRN_KEYS) {
-        if (response[key]) {
-            return response[key];
+        if (terminalData[key]) {
+            return terminalData[key];
         }
     }
     return null;
@@ -61,31 +86,53 @@ const callBpos1Terminal = async (method, config, order) => {
 
     const decimals = order.currency_id?.decimal_places ?? 2;
     const payload = buildBpos1Payload(order, decimals);
+
+    const baseUrl = `http://${host}:${port}`;
+    const formattedUrl = formatBpos1Url(baseUrl, method);
+    const baseHeaders = {
+        "x-api-key": apiKey,
+    };
+    const idempotencyKey = generateIdempotencyKey();
+
     if (merchantIdx != null) {
         payload.merchant_idx = merchantIdx;
     }
 
     const response = await fetchWithTimeout(
-        formatBpos1Url(`http://${host}:${port}`, method),
+        formattedUrl,
         {
             method: "POST",
             headers: {
+                ...baseHeaders,
                 "Content-Type": "application/json",
-                "x-api-key": apiKey,
+                "X-Idempotency-Key": idempotencyKey,
             },
             body: JSON.stringify(payload),
         },
         BPOS1_TIMEOUT_MS
     );
 
+    let operation = await parseBpos1Response(response, "BPOS1 terminal error");
+
+    const operationId = extractOperationId(operation);
+    if (!operationId) {
+        throw new Error("BPOS1 terminal error: Operation missing an ID");
+    }
+
+    const finalOperation = await waitForTerminalOperation(baseUrl, operationId, baseHeaders);
+    ensureTerminalSuccess(finalOperation);
+    return finalOperation;
+};
+
+const parseBpos1Response = async (response, prefix) => {
     const text = await response.text();
     if (!response.ok) {
         const detail = text || response.statusText;
-        throw new Error(`BPOS1 terminal error: ${detail}`);
+        throw new Error(`${prefix}: ${detail}`);
     }
 
     if (!text) {
-        return null;
+        return {};
     }
 
     try {
@@ -94,6 +141,80 @@ const callBpos1Terminal = async (method, config, order) => {
         return { result: text };
     }
 };
+
+const getTerminalData = (response) => {
+    const firstLevel = response?.result ?? response ?? {};
+    const terminalData = firstLevel?.result ?? firstLevel ?? {};
+    const aggregated = { ...terminalData };
+    const rootId = response?.id ?? firstLevel?.id;
+    if (rootId && !aggregated.id) {
+        aggregated.id = rootId;
+    }
+    return aggregated;
+};
+
+const extractOperationId = (operation) => {
+    const terminalData = getTerminalData(operation);
+    return terminalData?.id ?? null;
+};
+
+const getNormalizedStatus = (operation) => {
+    const terminalData = getTerminalData(operation);
+    if (!terminalData?.status) {
+        return "";
+    }
+    return terminalData.status.toString().trim().toLowerCase();
+};
+
+const getTerminalFailureMessage = (operation) => {
+    const terminalData = getTerminalData(operation);
+    return (
+        terminalData?.message ||
+        terminalData?.status_detail ||
+        terminalData?.error ||
+        terminalData?.reason ||
+        terminalData?.status ||
+        "Unknown terminal failure."
+    );
+};
+
+const waitForTerminalOperation = async (baseUrl, operationId, headers) => {
+    const pollUrl = formatBpos1Url(baseUrl, `terminal-operations/${operationId}`);
+    const deadline = Date.now() + BPOS1_TIMEOUT_MS;
+
+    while (Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, HEALTH_TIMEOUT_MS));
+        const response = await fetchWithTimeout(
+            pollUrl,
+            {
+                method: "GET",
+                headers,
+            },
+            HEALTH_TIMEOUT_MS
+        );
+        const operation = await parseBpos1Response(response, "BPOS1 terminal status error");
+        const status = getNormalizedStatus(operation);
+        if (!isInProgressStatus(status)) {
+            return operation;
+        }
+    }
+
+    throw new Error("BPOS1 terminal error: Terminal operation timed out. Please try again.");
+};
+
+const isInProgressStatus = (status) => status && IN_PROGRESS_STATUSES.has(status);
+
+const isFailedStatus = (status) => status && FAILED_STATUSES.has(status);
+
+const ensureTerminalSuccess = (operation) => {
+    const status = getNormalizedStatus(operation);
+    if (isFailedStatus(status)) {
+        throw new Error(`BPOS1 terminal error: ${getTerminalFailureMessage(operation)}`);
+    }
+};
+
+// The self-order flow never cancels a terminal operation once sent, so
+// /terminal-operations/{id}/cancel is intentionally unused here.
 
 patch(PaymentPage.prototype, {
     async startPayment() {
