@@ -1,4 +1,6 @@
-from odoo import models, fields
+import logging
+from odoo import fields, models
+_logger = logging.getLogger(__name__)
 
 
 class PosConfig(models.Model):
@@ -31,3 +33,34 @@ class PosConfig(models.Model):
         string="Fiscal Service Port",
         help="Port of the fiscal service (e.g. 8000)."
     )
+
+    def _load_pos_self_data_read(self, records, config):
+        result = super()._load_pos_self_data_read(records, config)
+
+        if not result:
+            return result
+
+        record = result[0]
+
+        # 🔥 FORCE your fields into final payload
+        record.update({
+            "use_pos_fiscal_service": config.use_pos_fiscal_service,
+            "fiscal_service_ip": config.fiscal_service_ip,
+            "fiscal_service_port": config.fiscal_service_port,
+            "pos_fiscal_service_api_key": config.pos_fiscal_service_api_key,
+        })
+
+        return result
+        
+
+    def _load_pos_self_data_fields(self, config):
+        fields_list = super()._load_pos_self_data_fields(config)
+        for field_name in (
+            'use_pos_fiscal_service',
+            'fiscal_service_ip',
+            'fiscal_service_port',
+            'pos_fiscal_service_api_key',
+        ):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
+        return fields_list
