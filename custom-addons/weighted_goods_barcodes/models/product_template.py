@@ -11,35 +11,26 @@ class ProductTemplate(models.Model):
         help='Check this box when the product is sold through a weighed barcode (PLU + weight).',
         default=False,
     )
-    weighted_bc_plu = fields.Integer(
-        string='Weighted goods PLU',
-        help='PLU value used in the weighted barcode (0-99999).',
-        copy=False,
+    weighted_bc_pos_plu_ids = fields.One2many(
+        'product.pos.plu',
+        'product_template_id',
+        string='Point of Sale PLUs',
     )
 
-    _sql_constraints = [
-        ('weighted_bc_plu_unique', 'unique(weighted_bc_plu)',
-         'Each weighted goods PLU must be unique.'),
-    ]
-
-    @api.constrains('is_weighted_bc', 'weighted_bc_plu')
+    @api.constrains('is_weighted_bc')
     def _check_weighted_bc_fields(self):
         for template in self:
             if template.is_weighted_bc:
-                if template.weighted_bc_plu in (False, None):
+                if not template.weighted_bc_pos_plu_ids:
                     raise ValidationError(
-                        _('A PLU code is required when the product is flagged as weighted.')
+                        _('At least one PLU must be defined for weighted products.')
                     )
-                if not 0 <= template.weighted_bc_plu <= 99999:
-                    raise ValidationError(
-                        _('The weighted PLU must be between 0 and 99999.')
-                    )
-            elif template.weighted_bc_plu:
+            elif template.weighted_bc_pos_plu_ids:
                 raise ValidationError(
-                    _('Uncheck the weighted barcode option before modifying the PLU.')
+                    _('Uncheck the weighted barcode option before assigning POS PLUs.')
                 )
 
     @api.model
     def _load_pos_data_fields(self, config):
         fields = super()._load_pos_data_fields(config)
-        return fields + ['is_weighted_bc', 'weighted_bc_plu']
+        return fields + ['is_weighted_bc', 'weighted_bc_pos_plu_ids']

@@ -8,6 +8,7 @@
     "data": [
         "security/ir.model.access.csv",
         "views/product_template_views.xml",
+        "views/product_pos_plu_views.xml",
         "views/res_config_settings_views.xml",
         "views/weighted_goods_filter_views.xml",
     ],
@@ -16,7 +17,10 @@
             "weighted_goods_barcodes/static/src/app/services/barcode_reader_patch.js",
             "weighted_goods_barcodes/static/src/app/services/pos_store_patch.js",
             "weighted_goods_barcodes/static/src/app/services/weighted_goods_barcode_service.js",
-        ]
+        ],
+        "web.assets_backend": [
+            "weighted_goods_barcodes/static/src/js/digital_scales_upload_action.js",
+        ],
     },
     "installable": True,
     "license": "LGPL-3",

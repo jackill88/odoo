@@ -3,14 +3,14 @@
 import { registry } from "@web/core/registry";
 
 export const WeightedGoodsBarcodeService = {
-    dependencies: ["barcode_reader", "pos_store"],
+    dependencies: ["barcode_reader", "pos"],
     async start(env, deps) {
-        const { barcode_reader, pos_store } = deps;
-        if (!barcode_reader || !pos_store) {
+        const { barcode_reader, pos } = deps;
+        if (!barcode_reader || !pos) {
             return;
         }
         const unregister = barcode_reader.register({
-            weighted_goods: (parsed) => pos_store.handleWeightedGoodsBarcode(parsed),
+            weighted_goods: (parsed) => pos.handleWeightedGoodsBarcode(parsed),
         });
         return {
             stop() {

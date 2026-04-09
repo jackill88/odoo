@@ -20,11 +20,19 @@ patch(PosStore.prototype, {
         if (!decoded) {
             return;
         }
-        const product = this.models["product.product"].find(
-            (item) =>
-                item.product_tmpl_id.is_weighted_bc &&
-                item.product_tmpl_id.weighted_bc_plu === decoded.plu
-        );
+        const product = this.models["product.product"].find((item) => {
+            if (!item.product_tmpl_id.is_weighted_bc) {
+                return false;
+            }
+            const pluRecord = (item.product_tmpl_id.weighted_bc_pos_plu_ids || []).find(
+                (candidate) => {
+                    const candidatePosId =
+                        candidate.pos_config_id?.[0] ?? candidate.pos_config_id?.id;
+                    return candidatePosId === this.config.id;
+                }
+            );
+            return pluRecord?.plu === decoded.plu;
+        });
         if (!product) {
             this.barcodeReader?.showNotFoundNotification(decoded);
             return;
