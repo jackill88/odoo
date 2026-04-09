@@ -4,10 +4,12 @@
     'sequence': 400,
     "category": "Point of Sale",
     "summary": "Support scanning weighted EAN-13 barcodes with PLU + weight information.",
-    "depends": ["sale", "point_of_sale"],
+    "depends": ["sale", "point_of_sale", "pos_self_order"],
     "data": [
+        "security/ir.model.access.csv",
         "views/product_template_views.xml",
         "views/res_config_settings_views.xml",
+        "views/weighted_goods_filter_views.xml",
     ],
     "assets": {
         "point_of_sale._assets_pos": [

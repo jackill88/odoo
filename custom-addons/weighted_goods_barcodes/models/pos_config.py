@@ -12,6 +12,14 @@ class PosConfig(models.Model):
         default=20,
     )
 
+    weighted_goods_filter_id = fields.Many2one(
+        "weighted.goods.filter",
+        string="Weighted goods filter",
+        domain=[("active", "=", True)],
+        help="Select the filter that determines which products are pushed to the scales service.",
+        ondelete="set null",
+    )
+
     _sql_constraints = [
         (
             "pos_config_weighted_prefix_positive",
