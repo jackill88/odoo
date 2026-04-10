@@ -82,21 +82,22 @@ class PosOrder(models.Model):
         }
 
         terminal_payments = self.payment_ids.filtered(
-            lambda pay: pay.payment_method_id.use_payment_terminal == 'bpos1'
+            lambda pay: pay.payment_method_id.use_payment_terminal
+            in ('bpos1', 'bpos1_terminal')
         )
         if terminal_payments:
             terminal = terminal_payments[0]
-            entry_mode = terminal.bpos1_terminal_entry_mode or ""
-            emv_aid = terminal.bpos1_terminal_emv_aid or ""
+            entry_mode = self._get_terminal_field_value(terminal, 'bpos1_terminal_entry_mode')
+            emv_aid = self._get_terminal_field_value(terminal, 'bpos1_terminal_emv_aid')
             payload.update({
-                "TerminalID": terminal.bpos1_terminal_id or "",
-                "ApprovalCode": terminal.bpos1_terminal_auth_code or "",
+                "TerminalID": self._get_terminal_field_value(terminal, 'bpos1_terminal_id'),
+                "ApprovalCode": self._get_terminal_field_value(terminal, 'bpos1_terminal_auth_code'),
                 "RRN": terminal.transaction_id or "",
-                "PAN": terminal.bpos1_terminal_pan or "",
+                "PAN": self._get_terminal_field_value(terminal, 'bpos1_terminal_pan'),
                 "EntryMode": entry_mode,
                 "EMVAID": emv_aid,
                 "PaymentSystemInfo": emv_aid if entry_mode in ("2", "3") else "",
-                "IssuerName": terminal.bpos1_terminal_payment_system or "",
+                "IssuerName": self._get_terminal_field_value(terminal, 'bpos1_terminal_payment_system'),
             })
 
         if self.partner_id.email:
@@ -146,3 +147,8 @@ class PosOrder(models.Model):
         existing_order.write({'document_fiscal_id': document_fiscal_id})
 
         return True
+
+    def _get_terminal_field_value(self, terminal_payment, field_name):
+        if field_name in terminal_payment._fields:
+            return getattr(terminal_payment, field_name) or ""
+        return ""

@@ -16,6 +16,12 @@ class PosConfig(models.Model):
         for field_name in ('currency_id', 'company_id', 'use_pricelist'):
             if field_name not in fields_list:
                 fields_list.append(field_name)
+        if 'trusted_config_ids' not in fields_list:
+            fields_list.append('trusted_config_ids')
+        if 'show_product_images' not in fields_list:
+            fields_list.append('show_product_images')
+        if 'fast_payment_method_ids' not in fields_list:
+            fields_list.append('fast_payment_method_ids')
         return fields_list
 
     def _load_pos_self_data_fields(self, config):
@@ -41,4 +47,6 @@ class PosConfig(models.Model):
         fields = res['search_params']['fields']
         if 'self_ordering_mode' not in fields:
             fields.append('self_ordering_mode')
+        if 'fast_payment_method_ids' not in fields:
+            fields.append('fast_payment_method_ids')
         return res

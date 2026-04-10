@@ -41,8 +41,8 @@ function getTerminalData(response) {
 }
 
 export class PaymentBpos1 extends PaymentInterface {
-    setup() {
-        super.setup(...arguments);
+    async setup() {
+        await super.setup(...arguments);
         this._pendingTerminalOperations = new Map();
     }
 
