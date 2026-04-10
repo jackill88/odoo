@@ -15,6 +15,23 @@
                         <label class="col-lg-4 o_light_label" string="Weighted goods filter" for="pos_weighted_goods_filter_id"/>
                         <field name="pos_weighted_goods_filter_id" class="col"/>
                     </div>
+                    <div class="row">
+                        <label class="col-lg-4 o_light_label" string="Scales service IP" for="pos_digital_scales_service_ip_address"/>
+                        <field name="pos_digital_scales_service_ip_address" class="col"/>
+                    </div>
+                    <div class="row">
+                        <label class="col-lg-4 o_light_label" string="Scales service port" for="pos_digital_scales_service_port"/>
+                        <field name="pos_digital_scales_service_port" class="col"/>
+                    </div>
+                    <div class="row">
+                        <label class="col-lg-4 o_light_label" string="Scales service API key" for="pos_digital_scales_service_api_key"/>
+                        <field name="pos_digital_scales_service_api_key" class="col" widget="password"/>
+                    </div>
+                    <div class="row mt-2">
+                        <button class="btn btn-primary" name="action_upload_weighted_goods_to_scales" type="object">
+                            Upload weighted PLUs to scales
+                        </button>
+                    </div>
                 </setting>
             </xpath>
         </field>

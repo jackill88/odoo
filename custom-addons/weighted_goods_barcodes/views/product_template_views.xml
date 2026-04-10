@@ -10,7 +10,7 @@
                     <group>
                         <group>
                             <field name="is_weighted_bc"/>
-                            <field name="weighted_bc_plu" modifiers='{"invisible": [["is_weighted_bc", "=", false]]}'/>
+                            <field name="weighted_bc_pos_plu_ids" modifiers='{"invisible": [["is_weighted_bc", "=", false]]}'/>
                         </group>
                         <group string="Nomenclature" colspan="2">
                             <div class="o_form_label">

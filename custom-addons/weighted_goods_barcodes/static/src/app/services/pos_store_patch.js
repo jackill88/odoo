@@ -21,17 +21,10 @@ patch(PosStore.prototype, {
             return;
         }
         const product = this.models["product.product"].find((item) => {
-            if (!item.product_tmpl_id.is_weighted_bc) {
-                return false;
-            }
-            const pluRecord = (item.product_tmpl_id.weighted_bc_pos_plu_ids || []).find(
-                (candidate) => {
-                    const candidatePosId =
-                        candidate.pos_config_id?.[0] ?? candidate.pos_config_id?.id;
-                    return candidatePosId === this.config.id;
-                }
+            return (
+                item.is_weighted_bc &&
+                item.weighted_bc_plu_for_pos === decoded.plu
             );
-            return pluRecord?.plu === decoded.plu;
         });
         if (!product) {
             this.barcodeReader?.showNotFoundNotification(decoded);
@@ -47,6 +40,14 @@ patch(PosStore.prototype, {
         }
         await this.addLineToCurrentOrder(values, { code: decoded }, product.needToConfigure());
         this.numberBuffer.reset();
-        this.showOptionalProductPopupIfNeeded(product);
+         this.showOptionalProductPopupIfNeeded(product);
     },
+
+    showOptionalProductPopupIfNeeded(product) {
+        if (product.pos_optional_product_ids?.length) {
+            this.dialog.add(OptionalProductPopup, {
+                productTemplate: product,
+            });
+        }
+    }
 });
