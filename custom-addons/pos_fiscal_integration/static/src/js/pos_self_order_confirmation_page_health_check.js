@@ -22,12 +22,11 @@ const FAILED_STATUSES = new Set([
 ]);
 const RRN_KEYS = ['rrn', 'RRN', 'referenceNumber', 'reference_number', 'terminal_rrn'];
 const generateIdempotencyKey = () => {
-    return "bd5683bc-1f4a-4bab-a2fe-e3a027bb1ed4";
-    // const cryptoImpl = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
-    // if (cryptoImpl && typeof cryptoImpl.randomUUID === 'function') {
-    //     return cryptoImpl.randomUUID();
-    // }
-    // return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const cryptoImpl = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
+    if (cryptoImpl && typeof cryptoImpl.randomUUID === 'function') {
+        return cryptoImpl.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
 const fetchWithTimeout = async (url, options, timeoutMs = HEALTH_TIMEOUT_MS) => {
     const controller = new AbortController();
@@ -75,7 +74,7 @@ const callBpos1Terminal = async (method, config, order) => {
     const host = config.fiscal_service_ip?.trim();
     const port = config.fiscal_service_port;
     const apiKey = config.pos_fiscal_service_api_key?.trim();
-    const merchantIdx = config.bpos1_merchant_idx;
+    const merchantIdx = 1;
 
     if (!host || !port) {
         throw new Error("Fiscal service IP/port is not configured on POS settings");

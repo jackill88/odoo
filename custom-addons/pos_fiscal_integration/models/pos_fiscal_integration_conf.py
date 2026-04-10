@@ -47,8 +47,7 @@ class PosConfig(models.Model):
             "use_pos_fiscal_service": config.use_pos_fiscal_service,
             "fiscal_service_ip": config.fiscal_service_ip,
             "fiscal_service_port": config.fiscal_service_port,
-            "pos_fiscal_service_api_key": config.pos_fiscal_service_api_key,
-            "bpos1_merchant_idx": config.bpos1_merchant_idx
+            "pos_fiscal_service_api_key": config.pos_fiscal_service_api_key
         })
 
         return result
@@ -60,8 +59,7 @@ class PosConfig(models.Model):
             'use_pos_fiscal_service',
             'fiscal_service_ip',
             'fiscal_service_port',
-            'pos_fiscal_service_api_key',
-            'bpos1_merchant_idx',
+            'pos_fiscal_service_api_key'
         ):
             if field_name not in fields_list:
                 fields_list.append(field_name)

@@ -15,7 +15,7 @@ class PosPaymentMethod(models.Model):
 
     def _get_payment_terminal_selection(self):
         return super()._get_payment_terminal_selection() + [
-            ('bpos1_terminal', 'BPOS1 Terminal (Bakong KHQR)')
+            ('bpos1_terminal', 'BPOS1 Terminal')
         ]
 
     @api.model
@@ -31,10 +31,27 @@ class PosPaymentMethod(models.Model):
     @api.model
     def _load_pos_data_fields(self, config):
         fields_list = super()._load_pos_data_fields(config)
-        return fields_list + [
+        for field_name in (
             'bpos1_terminal_merchant_id',
             'bpos1_terminal_device_id',
             'bpos1_terminal_store_code',
             'bpos1_terminal_token',
             'bpos1_terminal_secret',
-        ]
+        ):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
+        return fields_list
+
+    @api.model
+    def _load_pos_self_data_fields(self, config):
+        fields_list = super()._load_pos_self_data_fields(config)
+        for field_name in (
+            'bpos1_terminal_merchant_id',
+            'bpos1_terminal_device_id',
+            'bpos1_terminal_store_code',
+            'bpos1_terminal_token',
+            'bpos1_terminal_secret',
+        ):
+            if field_name not in fields_list:
+                fields_list.append(field_name)
+        return fields_list
