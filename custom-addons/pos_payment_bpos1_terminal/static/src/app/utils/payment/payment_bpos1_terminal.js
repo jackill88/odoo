@@ -104,8 +104,9 @@ export class PaymentBpos1Terminal extends PaymentInterface {
     }
 
     _refundPayloadExtra(line) {
+        // for the refund in bpos1 service we need 'rrn' attribute which is an original transaction id
         const rrn = line.uiState?.bpos1_rrn || line.transaction_id;
-        return rrn ? { original_rrn: rrn } : {};
+        return rrn ? { rrn: rrn } : {};
     }
 
     async _callTerminal(endpoint, payload, idempotencyKey, lineUuid) {

@@ -64,7 +64,7 @@ patch(OrderPaymentValidation.prototype, {
             let pos_result;
 
             if (is_refund) {
-                pos_result = await fetch(`http://${pos_fiscal_service_addess}:${pos_fiscal_service_port}/fiscal-receipt-return`,
+                pos_result = await fetch(`http://${pos_fiscal_service_addess}:${pos_fiscal_service_port}/fiscal-receipt-return?original_receipt_fiscal_id=${fiscal_payload.original_receipt_fiscal_id}`,
                     {   method: 'POST',
                          headers: {
                             'Content-Type': 'application/json',
