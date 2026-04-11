@@ -12,3 +12,4 @@ class PosPayment(models.Model):
     bpos1_terminal_entry_mode = fields.Char(string='BPOS1 Entry Mode')
     bpos1_terminal_emv_aid = fields.Char(string='BPOS1 EMV AID')
     bpos1_terminal_payment_system = fields.Char(string='BPOS1 payment system')
+    bpos1_terminal_idempotency_key = fields.Char(string='BPOS1 Idempotency Key')

@@ -104,7 +104,7 @@ export class PaymentBpos1Terminal extends PaymentInterface {
     }
 
     _refundPayloadExtra(line) {
-        const rrn = line.uiState?.bpos1_rrn || line.transaction_id || line.payment_ref_no || line.name;
+        const rrn = line.uiState?.bpos1_rrn || line.transaction_id;
         return rrn ? { original_rrn: rrn } : {};
     }
 
