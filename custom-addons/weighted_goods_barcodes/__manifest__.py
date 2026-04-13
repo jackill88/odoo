@@ -17,9 +17,14 @@
             "weighted_goods_barcodes/static/src/app/services/barcode_reader_patch.js",
             "weighted_goods_barcodes/static/src/app/services/pos_store_patch.js",
             "weighted_goods_barcodes/static/src/app/services/weighted_goods_barcode_service.js",
+            "weighted_goods_barcodes/static/src/app/services/weighted_goods_barcode_parser.js",
         ],
         "web.assets_backend": [
             "weighted_goods_barcodes/static/src/js/digital_scales_upload_action.js",
+        ],
+        "pos_self_order.assets": [
+            "weighted_goods_barcodes/static/src/app/services/self_order_service_patch.js",
+            "weighted_goods_barcodes/static/src/app/services/weighted_goods_barcode_parser.js",
         ],
     },
     "installable": True,

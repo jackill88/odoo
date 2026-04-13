@@ -42,12 +42,8 @@ class ProductProduct(models.Model):
         fields = super()._load_pos_data_fields(config)
         return fields + ['is_weighted_bc', 'weighted_bc_plu_for_pos']
 
-    def _load_pos_data_read(self, records, config):
-        read_records = super()._load_pos_data_read(records, config)
 
-        if not records or not config:
-            return read_records
-
+    def _load_extra_weighted_barcode_data(self, records, read_records, config):
         # 1 Get templates
         templates = records.mapped('product_tmpl_id')
 
@@ -81,4 +77,33 @@ class ProductProduct(models.Model):
             record['is_weighted_bc'] = is_weighted_map.get(tmpl_id, False)
             record['weighted_bc_plu_for_pos'] = plu_map.get(tmpl_id, False)
 
-        return read_records
+        return read_records or []
+
+
+    def _load_pos_data_read(self, records, config):
+        read_records = super()._load_pos_data_read(records, config)
+
+        if not records or not config:
+            return read_records
+
+        return self._load_extra_weighted_barcode_data(records, read_records, config)
+    
+
+    def _weighted_goods_barcodes_extra_fields(self):
+        return ['is_weighted_bc', 'weighted_bc_plu_for_pos']
+    
+
+    @api.model
+    def _load_pos_self_data_fields(self, config):
+        fields = super()._load_pos_self_data_fields(config)
+        return fields + self._weighted_goods_barcodes_extra_fields()
+    
+
+    def _load_pos_self_data_read(self, records, config):
+        read_records = super()._load_pos_self_data_read(records, config)
+
+        if not records or not config:
+            return read_records
+
+        return self._load_extra_weighted_barcode_data(records, read_records, config)
+        
