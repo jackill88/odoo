@@ -20,18 +20,6 @@
                     <span class="text-muted">Merchant ID</span>
                     <div class="fw-bold" t-esc="terminalMerchantId"/>
                 </div>
-                <div class="col-6">
-                    <span class="text-muted">Device ID</span>
-                    <div class="fw-bold" t-esc="terminalDeviceId"/>
-                </div>
-                <div class="col-6">
-                    <span class="text-muted">Store Code</span>
-                    <div class="fw-bold" t-esc="terminalStoreCode"/>
-                </div>
-                <div class="col-6">
-                    <span class="text-muted">Token</span>
-                    <div class="fw-bold" t-esc="terminalToken"/>
-                </div>
                 <div class="col-12">
                     <span class="text-muted">Secret</span>
                     <div class="fw-bold" t-esc="terminalSecretStatus"/>

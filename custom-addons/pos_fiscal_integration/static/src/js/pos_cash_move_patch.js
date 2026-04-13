@@ -59,7 +59,18 @@ patch(CashMovePopup.prototype, {
             // Check HTTP status
             if (!pos_result.ok) {
                 // pos_result.ok is true if status is 200–299
-                throw new Error(`Fiscal service error: ${pos_result.status} ${pos_result.statusText}`);
+                let errorDetail = pos_result.statusText;
+
+                try {
+                    const errorJson = await pos_result.json();
+                    errorDetail = errorJson.detail || JSON.stringify(errorJson);
+                } catch {
+                    // response is not JSON
+                    const text = await pos_result.text();
+                    if (text) errorDetail = text;
+                }
+
+                throw new Error(`Fiscal service error: ${pos_result.status} ${errorDetail}`);
             }
 
         } 

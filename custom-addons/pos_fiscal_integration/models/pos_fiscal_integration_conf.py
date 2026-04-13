@@ -1,5 +1,6 @@
 import logging
 from odoo import fields, models
+from odoo import api
 _logger = logging.getLogger(__name__)
 
 
@@ -51,16 +52,44 @@ class PosConfig(models.Model):
         })
 
         return result
+    
+    # @api.model
+    # def _load_pos_self_data_read(self, records, config):
+    #     read_records = super()._load_pos_data_read(records, config)
+    #     if not read_records:
+    #         return read_records
+    #     # record = read_records[0]
+    #     # record["use_pos_fiscal_service"]= config.use_pos_fiscal_service
+    #     # record["fiscal_service_ip"]= config.fiscal_service_ip
+    #     # record["fiscal_service_port"]= config.fiscal_service_port
+    #     # record["pos_fiscal_service_api_key"]=  config.pos_fiscal_service_api_key
+    #     return read_records
         
 
-    def _load_pos_self_data_fields(self, config):
-        fields_list = super()._load_pos_self_data_fields(config)
-        for field_name in (
-            'use_pos_fiscal_service',
-            'fiscal_service_ip',
-            'fiscal_service_port',
-            'pos_fiscal_service_api_key'
-        ):
-            if field_name not in fields_list:
-                fields_list.append(field_name)
-        return fields_list
+    # def _load_pos_self_data_fields(self, config):
+    #     fields_list = super()._load_pos_self_data_fields(config)
+    #     for field_name in (
+    #         'use_pos_fiscal_service',
+    #         'fiscal_service_ip',
+    #         'fiscal_service_port',
+    #         'pos_fiscal_service_api_key'
+    #     ):
+    #         if field_name not in fields_list:
+    #             fields_list.append(field_name)
+    #     return fields_list
+
+    # def load_data_params(self):
+    #     response = super().load_data_params()
+
+    #     if 'pos.config' in response:
+    #         if 'relations' in response['pos.config']:
+    #             for field_name, field_value in {
+    #                 'use_pos_fiscal_service': {'name': 'use_pos_fiscal_service', 'type': 'boolean', 'compute': False, 'related': False},
+    #                 'fiscal_service_ip':{'name': 'fiscal_service_ip', 'type': 'char', 'compute': False, 'related': False},
+    #                 'fiscal_service_port':{'name': 'fiscal_service_port', 'type': 'integer', 'compute': False, 'related': False},
+    #                 'pos_fiscal_service_api_key':{'name': 'pos_fiscal_service_api_key', 'type': 'char', 'compute': False, 'related': False}
+    #                 }.items():
+    #                 if field_name not in response['pos.config']['relations']:
+    #                     response['pos.config']['relations'].append(field_name)      
+
+    #     return response

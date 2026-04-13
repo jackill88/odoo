@@ -7,14 +7,17 @@ import OrderPaymentValidation from "@point_of_sale/app/utils/order_payment_valid
 import { logPosMessage } from "@point_of_sale/app/utils/pretty_console_log";
 export const CONSOLE_COLOR = "#F5B427";
 
+const POS_FISCAL_PAYLOAD_ROUTE = "/pos_fiscal/get_order_fiscal_payload";
+const POS_FISCAL_PAYLOAD_PUBLIC_ROUTE = "/pos_fiscal/get_order_fiscal_payload_public";
 
-
-async function getFiscalPayload(order) {
-    // get the serialized data for order ID from the backend
-    const payload = await rpc("/pos_fiscal/get_order_fiscal_payload", {
-        order_id: order.id, 
-    });
-    return payload
+async function getFiscalPayload(order, accessToken = null) {
+    const route = accessToken ? POS_FISCAL_PAYLOAD_PUBLIC_ROUTE : POS_FISCAL_PAYLOAD_ROUTE;
+    const params = { order_id: order.id };
+    if (accessToken) {
+        params.access_token = accessToken;
+    }
+    const payload = await rpc(route, params);
+    return payload;
 }
 
 patch(OrderPaymentValidation.prototype, {
@@ -88,7 +91,18 @@ patch(OrderPaymentValidation.prototype, {
             // Check HTTP status
             if (!pos_result.ok) {
                 // pos_result.ok is true if status is 200–299
-                throw new Error(`Fiscal service error: ${pos_result.status} ${pos_result.statusText}`);
+                let errorDetail = pos_result.statusText;
+
+                try {
+                    const errorJson = await pos_result.json();
+                    errorDetail = errorJson.detail || JSON.stringify(errorJson);
+                } catch {
+                    // response is not JSON
+                    const text = await pos_result.text();
+                    if (text) errorDetail = text;
+                }
+
+                throw new Error(`Fiscal service error: ${pos_result.status} ${errorDetail}`);
             }
 
             // Parse JSON body

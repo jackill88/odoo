@@ -35,24 +35,8 @@ export class PaymentScreenBpos1TerminalPanel extends Component {
         return this.terminalPaymentMethod?.bpos1_terminal_merchant_id || _t('Not configured');
     }
 
-    get terminalDeviceId() {
-        return this.terminalPaymentMethod?.bpos1_terminal_device_id || _t('Not configured');
-    }
-
-    get terminalStoreCode() {
-        return this.terminalPaymentMethod?.bpos1_terminal_store_code || _t('Not configured');
-    }
-
-    get terminalToken() {
-        return this.terminalPaymentMethod?.bpos1_terminal_token || _t('Not configured');
-    }
-
-    get terminalSecretStatus() {
-        return this.terminalPaymentMethod?.bpos1_terminal_secret ? _t('Stored') : _t('Not set');
-    }
-
     get panelDescription() {
-        return _t('Bakong KHQR is currently running in stub mode and auto-validates the payment without contacting a terminal.');
+        return _t('Integrates BPOS1-compatible POS terminals with this system.');
     }
 
     get orderRemaining() {

@@ -55,3 +55,17 @@ class PosPaymentMethod(models.Model):
             if field_name not in fields_list:
                 fields_list.append(field_name)
         return fields_list
+    
+    def _payment_request_from_kiosk(self, order):
+        if self.use_payment_terminal != 'bpos1_terminal':
+            return super()._payment_request_from_kiosk(order)
+
+        order.add_payment({
+            'amount': order.amount_total,
+            'payment_date': fields.Datetime.now(),
+            'payment_method_id': self.id,
+            'pos_order_id': order.id,
+        })
+        order.action_pos_order_paid()
+        order._send_payment_result('Success')
+        return 'Success'

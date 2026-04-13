@@ -22,12 +22,14 @@ const FAILED_STATUSES = new Set([
 ]);
 const RRN_KEYS = ['rrn', 'RRN', 'referenceNumber', 'reference_number', 'terminal_rrn'];
 const generateIdempotencyKey = () => {
-    const cryptoImpl = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
-    if (cryptoImpl && typeof cryptoImpl.randomUUID === 'function') {
-        return cryptoImpl.randomUUID();
-    }
-    return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    // const cryptoImpl = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
+    // if (cryptoImpl && typeof cryptoImpl.randomUUID === 'function') {
+    //     return cryptoImpl.randomUUID();
+    // }
+    // return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return "1776019706890-xkdnf4b3xw";
 };
+
 const fetchWithTimeout = async (url, options, timeoutMs = HEALTH_TIMEOUT_MS) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -254,7 +256,7 @@ patch(PaymentPage.prototype, {
         const paymentMethod = this.selectedPaymentMethod;
         let terminalRrn = null;
 
-        if (paymentMethod?.use_payment_terminal === "bpos1") {
+        if (paymentMethod?.use_payment_terminal === "bpos1_terminal") {
             try {
                 const endpoint = currentOrder.amount_total < 0 ? "/terminal-refund" : "/terminal-pay";
                 const response = await callBpos1Terminal(endpoint, config, currentOrder);
@@ -283,5 +285,6 @@ patch(PaymentPage.prototype, {
                 this.selfOrder.paymentError = true;
             }
         }
-    },
+
+}
 });
