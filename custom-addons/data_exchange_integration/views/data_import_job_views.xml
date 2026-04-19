@@ -23,7 +23,7 @@
             <form string="Import Job">
                 <header>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="pending,processing,done,failed"/>
+                           statusbar_visible="pending,processing,done,failed,discarded"/>
                 </header>
 
                 <sheet>

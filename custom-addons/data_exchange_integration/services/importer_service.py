@@ -56,7 +56,7 @@ class ImporterService:
                     job.add_log(_msg)
 
         if job:
-            job.add_log(f"Successfully processed {_successfully_processed} out of {total} records. Added: {_successfully_added}, updated: {_successfully_updated}")
+            job.add_log(f"{self.model_name}: successfully processed {_successfully_processed} out of {total} records. Added: {_successfully_added}, updated: {_successfully_updated}")
 
     # =============================
     # CORE CHUNK PROCESSING
@@ -124,6 +124,10 @@ class ImporterService:
     # ORM OPERATIONS
     # =============================
 
+    def _is_simple_vals(self, vals):
+        """helper function to define whether to use grouping strategy or not"""
+        return all(not isinstance(v, (list, dict, set)) for v in vals.values())
+
     def _bulk_create(self, to_create)->Tuple[list, int]:
         if not to_create:
             return ([], 0)
@@ -138,17 +142,29 @@ class ImporterService:
     def _bulk_update(self, to_update)->int:
         if not to_update:
             return 0
-
-        grouped = defaultdict(list)
+        
+        simple_grouped = defaultdict(list)
+        complex_updates = []
 
         for rec_id, vals in to_update:
-            grouped[frozenset(vals.items())].append(rec_id)
+            if self._is_simple_vals(vals):
+                simple_grouped[frozenset(vals.items())].append(rec_id)
+            else:
+                complex_updates.append((rec_id, vals))
 
         _no_updated = 0
-        for vals_key, ids in grouped.items():
+
+        # update grouped items (hashable)
+        for vals_key, ids in simple_grouped.items():
             vals_to_write = dict(vals_key)
             _ = vals_to_write.pop('id', None)
             self.Model.browse(ids).write(vals_to_write)
             _no_updated += len(ids)
+
+        # update complex items (non-hashable)
+        for rec_id, vals in complex_updates:
+            vals.pop('id', None)
+            self.Model.browse(rec_id).write(vals)
+            _no_updated +=1
 
         return _no_updated

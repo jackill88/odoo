@@ -1,8 +1,7 @@
 import logging
 import json
 
-from .goods_importer import GoodsImporter
-from .pricelist_importer import PricelistImporter
+from .master_import_registry import IMPORT_REGISTRY
 
 _logger = logging.getLogger(__name__)
 
@@ -16,32 +15,37 @@ class FileDispatcher:
     def __init__(self, env):
         self.env = env
 
-    def dispatch(self, filename, content, job=None):
+
+    def _resolve_type(self, filename):
+        name = filename.rsplit('.', 1)[0]  # remove .json
+
+        for file_type in IMPORT_REGISTRY.keys():
+            if name == file_type or name.startswith(file_type + "_"):
+                return file_type
+
+        return None
+    
+    def dispatch(self, file_type, content, job=None):
         try:
             data = json.loads(content)
         except Exception as e:
-            msg = f"Invalid JSON in {filename}: {e}"
-
             if job:
-                job.add_log(msg)
+                job.add_log(f"Invalid JSON in {file_type}: {e}")
                 job.state = 'discarded'
             return
 
-        if filename.startswith('goods'):
-            _logger.info("Dispatching GOODS: %s", filename)
-            GoodsImporter(self.env).run(data, job=job)
-
-        elif filename.startswith('prices'):
-            _logger.info("Dispatching PRICES: %s", filename)
-            PricelistImporter(self.env).run(data, job=job)
-
-        else:
-            msg = f"Unknown file type was provided: {filename}"
+        try:
+            importer_cls = IMPORT_REGISTRY[file_type]["importer"]
+        except:
+            msg = f"Unknown file type was provided: {file_type}"
 
             _logger.warning(msg)
 
             if job:
-                job.add_log(msg)
+                job.add_log(msg)  
+                job.state = 'discarded'
 
-            # 👇 important: DO NOT fail job
-            return
+            return         
+
+        _logger.info("Importing %s", file_type)
+        importer_cls(self.env).run(data, job=job)

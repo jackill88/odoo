@@ -14,6 +14,7 @@ import zipfile
 import logging
 
 from ..services.file_dispatcher import FileDispatcher
+from ..services.master_import_registry import resolve_import_order
 
 _logger = logging.getLogger(__name__)
 
@@ -94,7 +95,8 @@ class DataImportJob(models.Model):
 
         self.process_file()
 
-        self.state = 'done'
+        if not self.state in ['discarded']:
+            self.state = 'done'
 
 
     def _handle_failure(self, error):
@@ -155,13 +157,32 @@ class DataImportJob(models.Model):
 
         dispatcher = FileDispatcher(self.env)  # or service instance
 
+        file_map = {}
+
         for filename in z.namelist():
             if not filename.endswith('.json'):
                 continue
 
-            content = z.read(filename)
+            file_type = dispatcher._resolve_type(filename)
 
-            dispatcher.dispatch(filename, content, job=self)
+            if not file_type:
+                self.add_log(f'Unsupported file type: {filename}')
+                continue  # or log rejection
+
+            file_map[file_type] = z.read(filename)
+
+        if not file_map:
+            self.state = 'discarded'
+            return
+        
+        # we need to process our files in a specific order or else data might be corrupted
+        ordered_types = resolve_import_order(list(file_map.keys()))
+
+        for file_type in ordered_types:
+            filename = file_type  # logical name, not actual filename
+            content = file_map[file_type]
+            dispatcher.dispatch(file_type, content, job=self)
+
 
     # =============================
     # MAIN ENTRYPOINT
@@ -181,7 +202,8 @@ class DataImportJob(models.Model):
 
             self.process_file()  # reuse your existing logic
 
-            self.state = 'done'
+            if not self.state in ['discarded']:
+                self.state = 'done'
 
         except Exception:
             _logger.exception("Pull import failed")

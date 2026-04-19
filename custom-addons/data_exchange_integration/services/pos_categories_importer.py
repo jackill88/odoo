@@ -1,14 +1,17 @@
+# services/pos_categories_importer.py
+""" loads pos.category data"""
+
 import logging
 from .importer_service import ImporterService
 
 _logger = logging.getLogger(__name__)
 
 
-class GoodsImporter:
+class PosCategoriesImporter:
     """
     Handles product.product import from external system.
     """
-    _name = 'goods.importer'
+    _name = 'pos.category.importer'
 
     def __init__(self, env):
         self.env = env
@@ -16,7 +19,7 @@ class GoodsImporter:
     def run(self, data, job=None):
         service = ImporterService(
             self.env,
-            model_name='product.template',
+            model_name='pos.category',
             external_field='id',
             batch_size=1000
         )
@@ -26,14 +29,9 @@ class GoodsImporter:
                 return {
                     'id': item['id'],
                     'name': item['name'],
-                    'default_code': item.get('code'),
-                    'list_price': item.get('price', 0.0),
-                    'active': item.get('active'),
-                    'available_in_pos': True,
-                    'self_order_available': True,
                 }
             except Exception as e:
-                _msg = "Bad product data: %s", str(e)
+                _msg = "Bad POS categoty data: %s", str(e)
                 _logger.warning(_msg)
 
                 if job:
