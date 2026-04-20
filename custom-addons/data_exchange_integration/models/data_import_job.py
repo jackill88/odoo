@@ -1,4 +1,5 @@
 # models/data_import_job.py
+from collections import defaultdict
 from datetime import timedelta
 import paramiko
 import base64
@@ -155,9 +156,9 @@ class DataImportJob(models.Model):
     def process_file(self):
         z = zipfile.ZipFile(io.BytesIO(base64.b64decode(self.file_data)))
 
-        dispatcher = FileDispatcher(self.env)  # or service instance
+        dispatcher = FileDispatcher(self.env)
 
-        file_map = {}
+        file_map = defaultdict(list)
 
         for filename in z.namelist():
             if not filename.endswith('.json'):
@@ -167,21 +168,26 @@ class DataImportJob(models.Model):
 
             if not file_type:
                 self.add_log(f'Unsupported file type: {filename}')
-                continue  # or log rejection
+                continue
 
-            file_map[file_type] = z.read(filename)
+            content = z.read(filename)
+            file_map[file_type].append((filename, content))
 
         if not file_map:
             self.state = 'discarded'
             return
-        
-        # we need to process our files in a specific order or else data might be corrupted
+
         ordered_types = resolve_import_order(list(file_map.keys()))
 
         for file_type in ordered_types:
-            filename = file_type  # logical name, not actual filename
-            content = file_map[file_type]
-            dispatcher.dispatch(file_type, content, job=self)
+            files = file_map[file_type]
+
+            for filename, content in files:
+                dispatcher.dispatch(
+                    file_type,
+                    content,
+                    job=self
+                )
 
 
     # =============================
