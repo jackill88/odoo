@@ -13,7 +13,16 @@
         'views/views.xml',
         'views/product_template_views.xml'
     ],
+    'assets': {
+        'point_of_sale._assets_pos': [
+            'product_extra_barcodes/static/src/app/utils/extra_barcode_utils.js',
+            'product_extra_barcodes/static/src/app/models/product_extra_barcodes.js',
+            'product_extra_barcodes/static/src/app/screens/product_screen_patch.js',
+        ],
+        'pos_self_order.assets': [
+            'product_extra_barcodes/static/src/app/services/self_order_extra_barcode.js',
+        ],
+    },
     "installable": True,
     "license": "LGPL-3",
 }
-
