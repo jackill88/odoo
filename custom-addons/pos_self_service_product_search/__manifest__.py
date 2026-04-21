@@ -4,7 +4,7 @@
     "version": "1.0",
     "summary": "Adds a product search bar to the POS Self Order interface.",
     "category": "Point Of Sale",
-    "depends": ["pos_self_order"],
+    "depends": ["pos_self_order", "product_extra_barcodes"],
     "data": [],
     "assets": {
         "pos_self_order.assets": [

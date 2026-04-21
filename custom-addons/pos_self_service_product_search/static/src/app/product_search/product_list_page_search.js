@@ -38,9 +38,28 @@ patch(ProductListPage.prototype, {
             product.full_product_name,
             product.product_tmpl_id?.display_name,
         ];
+        const extraValue = this._getExtraBarcodeSearchValue(product);
+        if (extraValue) {
+            haystack.push(extraValue);
+        }
         return haystack.some((value) =>
             value?.toString?.().toLowerCase().includes(query)
         );
+    },
+
+    _getExtraBarcodeSearchValue(product) {
+        if (!product.extra_barcode_values) {
+            return "";
+        }
+        try {
+            const parsed = JSON.parse(product.extra_barcode_values);
+            if (Array.isArray(parsed)) {
+                return parsed.filter(Boolean).join(" ");
+            }
+        } catch (_error) {
+            return product.extra_barcode_values;
+        }
+        return "";
     },
 
     get productCategories() {
