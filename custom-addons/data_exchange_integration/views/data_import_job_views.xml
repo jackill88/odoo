@@ -43,6 +43,10 @@
                         <field name="log"/>
                     </group>
 
+                    <group string="Progress">
+                        <field name="processed_files" widget="json" readonly="1"/>
+                    </group>
+
                     <group string="Errors">
                         <field name="last_error"/>
                     </group>

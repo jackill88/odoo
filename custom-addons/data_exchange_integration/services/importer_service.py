@@ -15,7 +15,9 @@ class ImporterService:
     - chunk commits
     """
 
-    def __init__(self, env, model_name, external_field='id', batch_size=500):
+    def __init__(self, env, model_name, external_field='id', batch_size=500, 
+                 specific_model_create_method=None,
+                 specific_model_write_method=None):
         self.env = env
         self.model_name = model_name
         self.Model = env[model_name]
@@ -23,6 +25,8 @@ class ImporterService:
 
         self.external_field = external_field
         self.batch_size = batch_size
+        self.specific_model_create_method = specific_model_create_method
+        self.specific_model_write_method = specific_model_write_method 
 
     # =============================
     # PUBLIC ENTRYPOINT
@@ -126,14 +130,24 @@ class ImporterService:
 
     def _is_simple_vals(self, vals):
         """helper function to define whether to use grouping strategy or not"""
+        if self.specific_model_write_method is not None:
+            return False
+        
         return all(not isinstance(v, (list, dict, set)) for v in vals.values())
+
 
     def _bulk_create(self, to_create)->Tuple[list, int]:
         if not to_create:
             return ([], 0)
 
         vals_list = [vals for _, vals in to_create]
-        records = self.Model.create(vals_list)
+
+        if self.specific_model_create_method:
+            _create_method = getattr(self.Model, self.specific_model_create_method)
+            # it MUST return created models
+            records = _create_method(vals_list)
+        else:
+            records = self.Model.create(vals_list)
 
         ret = list(zip([ext for ext, _ in to_create], records))
 
@@ -162,9 +176,18 @@ class ImporterService:
             _no_updated += len(ids)
 
         # update complex items (non-hashable)
+
+        if self.specific_model_write_method:
+            _write_method = getattr(self.Model, self.specific_model_write_method)
+        else:
+            _write_method = None
+
         for rec_id, vals in complex_updates:
             vals.pop('id', None)
-            self.Model.browse(rec_id).write(vals)
+            if self.specific_model_write_method and _write_method:
+                _write_method(vals)
+            else:
+                self.Model.browse(rec_id).write(vals)
             _no_updated +=1
 
         return _no_updated

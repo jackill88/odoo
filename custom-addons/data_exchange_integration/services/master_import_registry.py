@@ -4,6 +4,9 @@ from .goods_importer import GoodsImporter
 from .product_pricelist_type_importer import ProductPricelistTypeImporter
 from .pricelist_importer import PricelistImporter
 from .goods_pos_categories_importer import ProductPosCategoryImporter
+from .pos_config_importer import PosConfigImporter
+from .pos_payment_method_importer import PosPaymentMethodImporter
+from .account_journal_importer import AccountJournalImporter
 
 from collections import defaultdict, deque
 
@@ -32,7 +35,19 @@ IMPORT_REGISTRY = {
     "product_pos_categories": {
         "importer": ProductPosCategoryImporter,
         "depends_on": ["goods", "pos_categories"]
-    }
+    },
+    "account_journals": {
+        "importer": AccountJournalImporter,
+        "depends_on": []
+    },
+    "pos_payment_methods": {
+        "importer": PosPaymentMethodImporter,
+        "depends_on": ["account_journals"],        
+    },
+    "pos_config": {
+        "importer": PosConfigImporter,
+        "depends_on": ["pos_payment_methods"],
+    },
 }
 
 

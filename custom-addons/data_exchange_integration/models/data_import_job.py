@@ -43,7 +43,11 @@ class DataImportJob(models.Model):
     next_attempt_at = fields.Datetime(index=True)
     last_error = fields.Text()
 
+    processed_files = fields.Json(default=list)
+
     locked_at = fields.Datetime()
+
+    BATCH_SIZE_DEFAULT = 5
 
     # =========================
     # keeping the log
@@ -85,19 +89,67 @@ class DataImportJob(models.Model):
     def _process_one(self):
         self.ensure_one()
 
-        self.attempt_count += 1
+        entries = self._ensure_processed_files()
+        if not entries:
+            return
 
-        file_bytes, filename = self._download_file()
+        dispatcher = FileDispatcher(self.env)
+        zip_bytes = self._ensure_archive_bytes()
+        batch_limit = self._get_batch_size()
+        processed = 0
 
-        self.write({
-            'file_data': base64.b64encode(file_bytes),
-            'file_name': filename,
+        while processed < batch_limit:
+            entry = self._get_next_pending_entry(entries)
+            if entry is None:
+                break
+
+            try:
+                content = self._read_entry_content(entry['filename'], zip_bytes)
+                dispatcher.dispatch(entry['file_type'], content, job=self)
+
+                if self.state == 'discarded':
+                    entry['state'] = 'failed'
+                    entry['attempts'] = self.max_attempts
+                    entry['error'] = 'Discarded by importer'
+                    self._persist_processed_files(entries, {'locked_at': False})
+                    self.env.cr.commit()
+                    return
+
+            except Exception as exc:
+                entry['state'] = 'failed'
+                entry['attempts'] = (entry.get('attempts') or 0) + 1
+                entry['error'] = str(exc)
+                self.last_error = str(exc)
+                extra = {'locked_at': False, 'last_error': self.last_error}
+                if entry['attempts'] >= self.max_attempts:
+                    extra.update({
+                        'state': 'failed',
+                        'attempt_count': self.max_attempts,
+                        'next_attempt_at': False,
+                    })
+                self._persist_processed_files(entries, extra)
+                self.env.cr.commit()
+                raise
+
+            entry['state'] = 'done'
+            entry['error'] = None
+            entry['attempts'] = 0
+
+            self.add_log(f"Imported {entry['file_type']} file {entry['filename']}")
+            self._persist_processed_files(entries)
+            self.env.cr.commit()
+            processed += 1
+
+            if not self._has_pending_entries(entries):
+                break
+
+        next_state = 'done' if not self._has_pending_entries(entries) else 'pending'
+        self._persist_processed_files(entries, {
+            'state': next_state,
+            'locked_at': False,
+            'attempt_count': 0,
+            'next_attempt_at': False,
         })
-
-        self.process_file()
-
-        if not self.state in ['discarded']:
-            self.state = 'done'
 
 
     def _handle_failure(self, error):
@@ -105,16 +157,30 @@ class DataImportJob(models.Model):
 
         self.last_error = str(error)
 
-        if self.attempt_count >= self.max_attempts:
-            self.state = 'failed'
+        if self.state == 'failed':
+            self.write({'last_error': self.last_error, 'locked_at': False})
             return
 
-        # exponential backoff
+        self.attempt_count += 1
+
+        if self.attempt_count >= self.max_attempts:
+            self.write({
+                'state': 'failed',
+                'attempt_count': self.attempt_count,
+                'next_attempt_at': False,
+                'locked_at': False,
+                'last_error': self.last_error,
+            })
+            return
+
         delay_minutes = 2 ** self.attempt_count
 
         self.write({
             'state': 'pending',
+            'attempt_count': self.attempt_count,
             'next_attempt_at': fields.Datetime.now() + timedelta(minutes=delay_minutes),
+            'locked_at': False,
+            'last_error': self.last_error,
         })
 
 
@@ -131,8 +197,8 @@ class DataImportJob(models.Model):
             'locked_at': False,
         })
 
-    
-    def _cron_process_jobs(self):    
+
+    def _cron_process_jobs(self):
         self._release_stale_jobs()
         jobs = self._acquire_jobs(limit=10)
 
@@ -150,44 +216,122 @@ class DataImportJob(models.Model):
 
 
     # =============================
-    # Processing logic
+    # Processing helpers
     # =============================
 
-    def process_file(self):
-        z = zipfile.ZipFile(io.BytesIO(base64.b64decode(self.file_data)))
+    def _ensure_archive_bytes(self):
+        if not self.file_data:
+            file_bytes, filename = self._download_file()
+            self.write({
+                'file_data': base64.b64encode(file_bytes),
+                'file_name': filename,
+            })
+            return file_bytes
 
+        try:
+            return base64.b64decode(self.file_data)
+        except Exception as exc:
+            raise ValueError("Stored archive is corrupted") from exc
+
+
+    def _get_batch_size(self):
+        payload = self.payload or {}
+        batch_from_payload = payload.get('batch_size')
+
+        try:
+            batch_value = int(batch_from_payload)
+        except (TypeError, ValueError):
+            batch_value = self.BATCH_SIZE_DEFAULT
+
+        if batch_value < 1:
+            batch_value = self.BATCH_SIZE_DEFAULT
+
+        return batch_value
+
+
+    def _ensure_processed_files(self):
+        if self.processed_files:
+            return self.processed_files
+
+        zip_bytes = self._ensure_archive_bytes()
         dispatcher = FileDispatcher(self.env)
-
         file_map = defaultdict(list)
 
-        for filename in z.namelist():
-            if not filename.endswith('.json'):
-                continue
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as z:
+            for filename in z.namelist():
+                if not filename.endswith('.json'):
+                    continue
 
-            file_type = dispatcher._resolve_type(filename)
+                file_type = dispatcher._resolve_type(filename)
 
-            if not file_type:
-                self.add_log(f'Unsupported file type: {filename}')
-                continue
+                if not file_type:
+                    self.add_log(f'Unsupported file type: {filename}')
+                    continue
 
-            content = z.read(filename)
-            file_map[file_type].append((filename, content))
+                file_map[file_type].append(filename)
 
         if not file_map:
-            self.state = 'discarded'
-            return
+            self.add_log('Archive did not contain any supported JSON files.')
+            self._persist_processed_files([], {
+                'state': 'discarded',
+                'locked_at': False,
+            })
+            return []
 
-        ordered_types = resolve_import_order(list(file_map.keys()))
+        try:
+            ordered_types = resolve_import_order(list(file_map.keys()))
+        except Exception as exc:
+            self.last_error = str(exc)
+            self.state = 'failed'
+            self.write({
+                'state': 'failed',
+                'locked_at': False,
+                'last_error': self.last_error,
+            })
+            raise
 
+        entries = []
         for file_type in ordered_types:
-            files = file_map[file_type]
+            for filename in file_map[file_type]:
+                entries.append({
+                    'filename': filename,
+                    'file_type': file_type,
+                    'state': 'pending',
+                    'attempts': 0,
+                    'error': None,
+                })
 
-            for filename, content in files:
-                dispatcher.dispatch(
-                    file_type,
-                    content,
-                    job=self
-                )
+        self._persist_processed_files(entries)
+        return entries
+
+
+    def _persist_processed_files(self, entries, extra=None):
+        payload = {'processed_files': entries}
+        if extra:
+            payload.update(extra)
+        self.write(payload)
+        self.processed_files = entries
+
+
+    def _get_next_pending_entry(self, entries):
+        for entry in entries:
+            attempts = entry.get('attempts', 0)
+            if entry['state'] in ('pending', 'failed') and attempts < self.max_attempts:
+                return entry
+        return None
+
+
+    def _has_pending_entries(self, entries):
+        return any(
+            entry['state'] in ('pending', 'failed') and entry.get('attempts', 0) < self.max_attempts
+            for entry in entries
+        )
+
+
+    def _read_entry_content(self, filename, zip_bytes=None):
+        zip_bytes = zip_bytes or self._ensure_archive_bytes()
+        with zipfile.ZipFile(io.BytesIO(zip_bytes)) as z:
+            return z.read(filename)
 
 
     # =============================
@@ -196,24 +340,20 @@ class DataImportJob(models.Model):
 
     def process_pull(self):
         self.ensure_one()
-        self.state = 'processing'
+        self.write({
+            'state': 'processing',
+            'locked_at': fields.Datetime.now(),
+        })
 
         try:
-            file_bytes, filename = self._download_file()
+            self._process_one()
+            self.env.cr.commit()
 
-            self.write({
-                'file_data': base64.b64encode(file_bytes),
-                'file_name': filename,
-            })
-
-            self.process_file()  # reuse your existing logic
-
-            if not self.state in ['discarded']:
-                self.state = 'done'
-
-        except Exception:
+        except Exception as exc:
             _logger.exception("Pull import failed")
-            self.state = 'failed'
+            self.env.cr.rollback()
+            self._handle_failure(exc)
+            self.env.cr.commit()
 
     # =============================
     # TRANSPORT ROUTER
@@ -303,4 +443,3 @@ class DataImportJob(models.Model):
             return self._download_url()
         else:
             raise ValueError(f"Unsupported source: {source}")
-        
