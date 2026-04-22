@@ -1,4 +1,4 @@
-from odoo import http
+from odoo import fields, http
 from odoo.http import request
 
 
@@ -11,7 +11,7 @@ class PosOrderExportController(http.Controller):
         csrf=False,
     )
     def list_paid_orders_by_inernal_pos_config_id(self, pos_config_id, **params):
-        """Return the paid POS orders and confirmed refunds for a single config."""
+        """Return the paid POS orders and confirmed refunds for a single config with split counts."""
         config = request.env['pos.config'].sudo().browse(pos_config_id)
         if not config.exists():
             return {
@@ -24,11 +24,15 @@ class PosOrderExportController(http.Controller):
             ('data_exchange_processed', '!=', True),
         ]
         orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
+        sales_orders = orders.filtered(lambda order: not order.is_refund)
+        refund_orders = orders.filtered(lambda order: order.is_refund)
 
         return {
             'pos_config_id': config.id,
             'pos_order_ids': orders.ids,
-            'order_count': len(orders),
+            'total_order_count': len(orders),
+            'sale_order_count': len(sales_orders),
+            'refund_order_count': len(refund_orders),
         }
     
 
@@ -40,7 +44,7 @@ class PosOrderExportController(http.Controller):
         csrf=False,
     )
     def list_paid_orders_by_external_pos_config_id(self, ext_pos_config_id, **params):
-        """Return the paid POS orders and confirmed refunds for a single config."""
+        """Return the paid POS orders (sales) and confirmed refund orders for a single config with split counts."""
         internal_pos_config = request.env['external.id.map'].search([
             ('external_id', '=', str(ext_pos_config_id)),
             ('model', '=', 'pos.config')
@@ -64,11 +68,16 @@ class PosOrderExportController(http.Controller):
             ('state', 'in', ['paid', 'done']),
         ]
         orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
+        sales_orders = orders.filtered(lambda order: not order.is_refund)
+        refund_orders = orders.filtered(lambda order: order.is_refund)
 
         return {
             'pos_config_id': config.id,
-            'pos_order_ids': orders.ids,
-            'order_count': len(orders),
+            'pos_order_ids': sales_orders.ids,
+            'pos_refund_order_ids': refund_orders.ids,
+            'total_order_count': len(orders),
+            'sale_order_count': len(sales_orders),
+            'refund_order_count': len(refund_orders),
         }
 
     @http.route(
@@ -86,6 +95,31 @@ class PosOrderExportController(http.Controller):
 
         config = order.config_id
         config_external_id = self._get_external_id('pos.config', config.id) if config else None
+        pricelist = order.pricelist_id
+        pricelist_external_id = self._get_external_id('product.pricelist', pricelist.id) if pricelist else None
+
+        client_timezone = (
+            params.get('timezone')
+            or request.httprequest.headers.get('X-Client-Timezone')
+            or request.env.user.tz
+            or 'UTC'
+        )
+        server_timezone = request.env.user.tz or 'UTC'
+        if client_timezone == server_timezone:
+            localized_date_order = (
+                fields.Datetime.to_string(order.date_order)
+                if order.date_order
+                else None
+            )
+        else:
+            localized_date_order = fields.Datetime.context_timestamp(
+                order.with_context(tz=client_timezone), order.date_order
+            )
+            localized_date_order = (
+                fields.Datetime.to_string(localized_date_order)
+                if localized_date_order
+                else None
+            )
 
         lines = []
         for line in order.lines:
@@ -105,21 +139,35 @@ class PosOrderExportController(http.Controller):
             })
 
         refunded_order = order.refunded_order_id or False
+        payment_lines = []
+        for payment in order.payment_ids:
+            payment_method = payment.payment_method_id
+            journal = payment_method.journal_id if payment_method else payment.journal_id
+            is_cash = journal.type == 'cash' if journal else False
+            payment_lines.append({
+                'amount': payment.amount,
+                'is_cash': is_cash,
+            })
         return {
             'pos_order_id': order.id,
             'pos_config': {
                 'id': config.id if config else None,
                 'external_id': config_external_id,
             },
+            'pricelist': {
+                'id': pricelist.id if pricelist else None,
+                'external_id': pricelist_external_id,
+            },
             'line_count': len(lines),
             'refunded_order_id': refunded_order.id if refunded_order else None,
             'refunded_order_external_id': self._get_external_id('pos.order', refunded_order.id) if refunded_order else None,
             'name': order.name,
             'state': order.state,
-            'date_order': order.date_order,
+            'date_order': localized_date_order,
             'amount_total': order.amount_total,
             'amount_paid': order.amount_paid,
             'lines': lines,
+            'payment_lines': payment_lines,
         }
 
     @http.route(
