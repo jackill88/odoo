@@ -1,0 +1,16 @@
+<odoo>
+    <record id="view_pricelist_item_form_inherit_latest_purchase" model="ir.ui.view">
+        <field name="name">product.pricelist.item.form.inherit.latest.purchase</field>
+        <field name="model">product.pricelist.item</field>
+        <field name="inherit_id" ref="product.product_pricelist_item_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Fixed price addon:" class="o_settings_container mt16">
+                    <group>
+                        <field name="adjusted_manual_price"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,35 @@
+name: Sync 'custom-addons' to another repo
+
+on:
+  push:
+    branches:
+      - pos-cashalot-integration
+    paths:
+      - 'custom-addons/**'   # trigger only when folder changes
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # REQUIRED for full history
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Add target repo remote
+        run: |
+          git remote add target https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/jackill88/odoo.git
+
+      - name: Split subtree
+        run: |
+          git subtree split --prefix=custom-addons -b split-branch
+
+      - name: Push to target repo
+        run: |
+          git push target split-branch:main --force

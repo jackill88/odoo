@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_self_order.ProductListPage" t-inherit="pos_self_order.ProductListPage" t-inherit-mode="extension">
+        <xpath expr="//div[contains(@class, 'category_container')]" position="before">
+            <div class="product-search-container px-3 px-kiosk-p-4 py-2">
+                <div class="input-group product-search-input-group">
+                    <span class="input-group-text bg-view border-0 text-muted">
+                        <i class="fa fa-search" aria-hidden="true" />
+                    </span>
+                    <input
+                        type="search"
+                        class="form-control form-control-lg border-0 product-search-input"
+                        placeholder.translate="Search products..."
+                        t-att-value="state.searchQuery"
+                        t-on-input="(ev) => (state.searchQuery = ev.target.value)"
+                    />
+                    <button
+                        type="button"
+                        t-att-class="'btn btn-outline-secondary btn-lg product-search-clear' + (state.searchQuery ? '' : ' d-none')"
+                        t-on-click="() => (state.searchQuery = '')"
+                    >
+                        <i class="fa fa-times" aria-hidden="true" />
+                    </button>
+                </div>
+            </div>
+        </xpath>
+        <xpath expr="//div[@class='d-flex flex-grow-1 overflow-y-auto o_self_fade position-relative']" position="before">
+            <div t-if="noProductFound" class="o_self_search-empty text-center w-100 py-5">
+                <i class="fa fa-search fa-3x text-muted mb-3" />
+                <p class="fs-5 fw-bold text-muted mb-1">No products match your search.</p>
+                <p class="text-muted small mb-0">Clear the search to return to the menu.</p>
+            </div>
+        </xpath>
+        <xpath expr="//div[@class='d-flex flex-grow-1 overflow-y-auto o_self_fade position-relative']" position="attributes">
+            <attribute name="t-if">!noProductFound</attribute>
+        </xpath>
+    </t>
+</templates>

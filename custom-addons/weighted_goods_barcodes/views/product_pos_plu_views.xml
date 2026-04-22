@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_pos_plu_tree" model="ir.ui.view">
+        <field name="name">product.pos.plu.tree</field>
+        <field name="type">list</field>
+        <field name="model">product.pos.plu</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="pos_config_id"/>
+                <field name="plu"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_product_pos_plu_form" model="ir.ui.view">
+        <field name="name">product.pos.plu.form</field>
+        <field name="model">product.pos.plu</field>
+        <field name="arch" type="xml">
+            <form string="Product PLU">
+                <sheet>
+                    <group>
+                        <field name="product_template_id" readonly="1"/>
+                        <field name="pos_config_id"/>
+                        <field name="plu"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

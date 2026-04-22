@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_animal,animal,model_animal,,1,1,1,1
+access_animal_type,animal.type,model_animal_type,,1,1,1,1
+access_animal_category,animal.category,model_animal_category,,1,1,1,1
+access_exam,animal.examination,model_animal_examination,,1,1,1,1
+access_exam_file,animal.examination.file,model_animal_examination_file,,1,1,1,1
