@@ -66,6 +66,7 @@ class PosOrderExportController(http.Controller):
         domain = [
             ('config_id', '=', config.id),
             ('state', 'in', ['paid', 'done']),
+            ('data_exchange_processed', '!=', True),
         ]
         orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
         sales_orders = orders.filtered(lambda order: not order.is_refund)
