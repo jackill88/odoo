@@ -3,7 +3,8 @@ name: Sync 'custom-addons' to another repo
 on:
   push:
     branches:
-      - pos-cashalot-integration
+      - "19.0"
+      - "pos-cashalot-integration"
     paths:
       - 'custom-addons/**'   # trigger only when folder changes
 
