@@ -11,21 +11,18 @@ class PosOrderExportController(http.Controller):
         csrf=False,
     )
     def list_paid_orders_by_inernal_pos_config_id(self, pos_config_id, **params):
-        """Return the paid POS orders and confirmed refunds for a single config with split counts."""
+        """Return unprocessed paid POS orders (with counts) for a single config."""
         config = request.env['pos.config'].sudo().browse(pos_config_id)
         if not config.exists():
             return {
                 'error': f'Point of Sale configuration {pos_config_id} not found',
             }
-
-        domain = [
-            ('config_id', '=', config.id),
-            ('state', 'in', ['paid', 'done']),
-            ('data_exchange_processed', '!=', True),
-        ]
-        orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
-        sales_orders = orders.filtered(lambda order: not order.is_refund)
-        refund_orders = orders.filtered(lambda order: order.is_refund)
+        orders, sales_orders, refund_orders = self._fetch_paid_orders_with_split(
+            config,
+            extra_domain=[
+                ('data_exchange_processed', '!=', True),
+            ],
+        )
 
         return {
             'pos_config_id': config.id,
@@ -44,7 +41,7 @@ class PosOrderExportController(http.Controller):
         csrf=False,
     )
     def list_paid_orders_by_external_pos_config_id(self, ext_pos_config_id, **params):
-        """Return the paid POS orders (sales) and confirmed refund orders for a single config with split counts."""
+        """Return paid POS sales and refunds (with counts) for a single config mapped by external ID."""
         internal_pos_config = request.env['external.id.map'].search([
             ('external_id', '=', str(ext_pos_config_id)),
             ('model', '=', 'pos.config')
@@ -63,14 +60,12 @@ class PosOrderExportController(http.Controller):
                 'error': f'Point of Sale configuration {internal_pos_config_id} not found',
             }
 
-        domain = [
-            ('config_id', '=', config.id),
-            ('state', 'in', ['paid', 'done']),
-            ('data_exchange_processed', '!=', True),
-        ]
-        orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
-        sales_orders = orders.filtered(lambda order: not order.is_refund)
-        refund_orders = orders.filtered(lambda order: order.is_refund)
+        orders, sales_orders, refund_orders = self._fetch_paid_orders_with_split(
+            config,
+            extra_domain=[
+                ('data_exchange_processed', '!=', True),
+            ],
+        )
 
         return {
             'pos_config_id': config.id,
@@ -80,6 +75,19 @@ class PosOrderExportController(http.Controller):
             'sale_order_count': len(sales_orders),
             'refund_order_count': len(refund_orders),
         }
+
+    def _fetch_paid_orders_with_split(self, config, extra_domain=None):
+        """Return paid orders plus split sales/refunds for a config."""
+        domain = [
+            ('config_id', '=', config.id),
+            ('state', 'in', ['paid', 'done']),
+        ]
+        if extra_domain:
+            domain += extra_domain
+        orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
+        sales_orders = orders.filtered(lambda order: not order.is_refund)
+        refund_orders = orders.filtered(lambda order: order.is_refund)
+        return orders, sales_orders, refund_orders
 
     @http.route(
         '/api/data-exchange/pos/order/<int:order_id>',
