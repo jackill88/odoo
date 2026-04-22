@@ -4,7 +4,7 @@ from odoo.http import request
 
 class PosOrderExportController(http.Controller):
     @http.route(
-        '/api/data-exchange/get-data/pos/by-internal-id/<int:pos_config_id>/pos-order/list',
+        '/api/data-exchange/pos/by-internal-id/<int:pos_config_id>/pos-order/list',
         type='jsonrpc',
         auth='bearer',
         methods=['GET'],
@@ -21,8 +21,9 @@ class PosOrderExportController(http.Controller):
         domain = [
             ('config_id', '=', config.id),
             ('state', 'in', ['paid', 'done']),
+            ('data_exchange_processed', '!=', True),
         ]
-        orders = request.env['pos.order'].sudo().search(domain, order='date_order desc')
+        orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
 
         return {
             'pos_config_id': config.id,
@@ -32,7 +33,7 @@ class PosOrderExportController(http.Controller):
     
 
     @http.route(
-        '/api/data-exchange/get-data/pos/by-external-id/<string:ext_pos_config_id>/pos-order/list',
+        '/api/data-exchange/pos/by-external-id/<string:ext_pos_config_id>/pos-order/list',
         type='jsonrpc',
         auth='bearer',
         methods=['GET'],
@@ -62,7 +63,7 @@ class PosOrderExportController(http.Controller):
             ('config_id', '=', config.id),
             ('state', 'in', ['paid', 'done']),
         ]
-        orders = request.env['pos.order'].sudo().search(domain, order='date_order desc')
+        orders = request.env['pos.order'].sudo().search(domain, order='create_date asc')
 
         return {
             'pos_config_id': config.id,
@@ -71,8 +72,8 @@ class PosOrderExportController(http.Controller):
         }
 
     @http.route(
-        '/api/data-exchange/get-data/pos/order/<int:order_id>',
-        type='json',
+        '/api/data-exchange/pos/order/<int:order_id>',
+        type='jsonrpc',
         auth='bearer',
         methods=['GET'],
         csrf=False,
@@ -119,6 +120,38 @@ class PosOrderExportController(http.Controller):
             'amount_total': order.amount_total,
             'amount_paid': order.amount_paid,
             'lines': lines,
+        }
+
+    @http.route(
+        '/api/data-exchange/pos/order/<int:order_id>/mark-processed',
+        type='jsonrpc',
+        auth='bearer',
+        methods=['POST'],
+        csrf=False,
+    )
+    def mark_order_as_processed(self, order_id, **params):
+        """Mark a pos.order as processed by the data exchange integration."""
+        order = request.env['pos.order'].sudo().browse(order_id)
+        if not order.exists():
+            return {'error': f'POS order {order_id} not found'}
+
+        payload = request.get_json_data()
+        if payload:
+            external_id = payload.get('order_external_id')
+            if not external_id:
+                return {'error': 'order_external_id is required in the payload'}
+        else:
+            return {'error': 'order_external_id is required in the payload'}
+            
+
+        order.write({
+            'data_exchange_processed': True,
+            'data_exchange_external_id': external_id,
+        })
+        return {
+            'pos_order_id': order.id,
+            'data_exchange_processed': order.data_exchange_processed,
+            'data_exchange_external_id': order.data_exchange_external_id,
         }
 
     def _get_external_id(self, model_name, res_id):
