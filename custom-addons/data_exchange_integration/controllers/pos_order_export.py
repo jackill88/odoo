@@ -7,7 +7,7 @@ class PosOrderExportController(http.Controller):
         '/api/data-exchange/pos/by-internal-id/<int:pos_config_id>/pos-order/list',
         type='jsonrpc',
         auth='bearer',
-        methods=['GET'],
+        methods=['GET','POST'],
         csrf=False,
     )
     def list_paid_orders_by_inernal_pos_config_id(self, pos_config_id, **params):
@@ -36,7 +36,7 @@ class PosOrderExportController(http.Controller):
         '/api/data-exchange/pos/by-external-id/<string:ext_pos_config_id>/pos-order/list',
         type='jsonrpc',
         auth='bearer',
-        methods=['GET'],
+        methods=['GET','POST'],
         csrf=False,
     )
     def list_paid_orders_by_external_pos_config_id(self, ext_pos_config_id, **params):
@@ -75,7 +75,7 @@ class PosOrderExportController(http.Controller):
         '/api/data-exchange/pos/order/<int:order_id>',
         type='jsonrpc',
         auth='bearer',
-        methods=['GET'],
+        methods=['GET','POST'],
         csrf=False,
     )
     def get_order_by_id(self, order_id, **params):
