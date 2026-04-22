@@ -1,6 +1,7 @@
 name: Sync 'custom-addons' to another repo
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "19.0"
