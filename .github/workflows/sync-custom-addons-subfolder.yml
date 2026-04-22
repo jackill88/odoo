@@ -14,10 +14,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source repo
+      - name: Checkout custom-addons
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # REQUIRED for full history
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: |
+            custom-addons
+          sparse-checkout-cone-mode: true
 
       - name: Configure Git
         run: |
