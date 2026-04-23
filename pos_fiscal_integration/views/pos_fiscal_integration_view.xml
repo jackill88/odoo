@@ -1,0 +1,20 @@
+<odoo>
+    <record id="view_pos_config_form_fiscal" model="ir.ui.view">
+        <field name="name">pos.config.form.fiscal</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Fiscal Service Integration" class="o_settings_container mt16">
+                    <group>
+                        <field name="use_pos_fiscal_service"/>
+                        <field name="pos_fiscal_service_api_key"/>
+                        <field name="unique_fiscal_number"/>
+                        <field name="fiscal_service_ip"/>
+                        <field name="fiscal_service_port"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
