@@ -1,5 +1,0 @@
-<odoo>
-    <record id="group_data_import" model="res.groups">
-        <field name="name">Data Exchange Manager</field>
-    </record>
-</odoo>
