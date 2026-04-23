@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_data_import_job,data.import.job,model_data_import_job,base.group_user,1,1,1,1
-access_sftp_config,data.import.sftp.config,model_data_import_sftp_config,base.group_user,1,1,1,1
-access_s3_config,data.import.s3.config,model_data_import_s3_config,base.group_user,1,1,1,1
-access_external_id_map,data.external.id.map,model_external_id_map,base.group_user,1,1,1,1
