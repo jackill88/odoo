@@ -1,0 +1,3 @@
+[submodule "custom-addons"]
+	path = custom-addons
+	url = https://github.com/jackill88/odoo-extra-modules.git
