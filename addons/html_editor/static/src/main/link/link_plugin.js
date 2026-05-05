@@ -1,6 +1,6 @@
 import { Plugin } from "@html_editor/plugin";
-import { unwrapContents } from "@html_editor/utils/dom";
 import { closestElement, descendants, selectElements } from "@html_editor/utils/dom_traversal";
+import { mergeAdjacentTextNodes, unwrapContents } from "@html_editor/utils/dom";
 import { findInSelection, callbacksForCursorUpdate } from "@html_editor/utils/selection";
 import { _t } from "@web/core/l10n/translation";
 import { LinkPopover } from "./link_popover";
@@ -8,6 +8,7 @@ import { DIRECTIONS, leftPos, nodeSize, rightPos } from "@html_editor/utils/posi
 import { EMAIL_REGEX, URL_REGEX, cleanZWChars, deduceURLfromText } from "./utils";
 import {
     isElement,
+    isPhrasingContent,
     isProtected,
     isProtecting,
     isVisible,
@@ -742,7 +743,7 @@ export class LinkPlugin extends Plugin {
             // create a font tag inside it, and move the color to the font tag.
             // This ensures the color is applied to the font element instead of
             // the anchor element itself.
-            if (color && childNodes.every((n) => !isBlock(n))) {
+            if (color && childNodes.every(isPhrasingContent)) {
                 anchorEl.style.removeProperty("color");
                 const font = selectElements(anchorEl, "font").next().value;
                 if (font && cleanZWChars(anchorEl.textContent) === font.textContent) {
@@ -1178,7 +1179,9 @@ export class LinkPlugin extends Plugin {
             selection.anchorNode.nodeType === Node.TEXT_NODE
         ) {
             // Merge adjacent text nodes.
-            selection.anchorNode.parentNode.normalize();
+            const cursor = this.dependencies.selection.preserveSelection();
+            mergeAdjacentTextNodes(selection.anchorNode.parentNode, cursor);
+            cursor.restore();
             selection = this.dependencies.selection.getEditableSelection();
             const textSliced = selection.anchorNode.textContent.slice(0, selection.anchorOffset);
             const textNodeSplitted = textSliced.split(/\s/);
@@ -1306,7 +1309,10 @@ export class LinkPlugin extends Plugin {
                     }
                 ),
                 isAvailable: link_popover.isAvailable,
-                getProps: link_popover.getProps,
+                getProps: (...args) => ({
+                    ...link_popover.getProps(...args),
+                    publicAttachments: this.config.publicAttachments,
+                }),
             });
         });
     }
