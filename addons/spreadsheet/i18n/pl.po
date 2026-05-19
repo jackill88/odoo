@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-13 18:38+0000\n"
-"PO-Revision-Date: 2026-03-25 13:54+0000\n"
+"POT-Creation-Date: 2026-04-24 17:37+0000\n"
+"PO-Revision-Date: 2026-04-13 20:51+0000\n"
 "Last-Translator: \"Marta (wacm)\" <wacm@odoo.com>\n"
 "Language-Team: Polish <https://translate.odoo.com/projects/odoo-19/"
 "spreadsheet/pl/>\n"
@@ -268,6 +268,12 @@ msgstr "%s dopasowań we wszystkich arkuszach"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid "'${str}'"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "(Blanks)"
 msgstr "(puste)"
@@ -359,6 +365,12 @@ msgstr "2 wiersze"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "=PIVOT(${"
 msgstr "=PIVOT(${"
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
+msgid "A"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -1166,27 +1178,6 @@ msgstr "Podczas przesyłania obrazu wystąpił nieoczekiwany błąd"
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"An unexpected error occurred while pasting content.\n"
-"          Additional information can be found in the browser console."
-msgstr ""
-"Podczas wklejania zawartości wystąpił nieoczekiwany błąd.\n"
-"          Dodatkowe informacje znajdziesz w konsoli przeglądarki."
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"An unexpected error occurred while pasting content.\n"
-"          This is probably due to a spreadsheet version mismatch."
-msgstr ""
-"Podczas wklejania zawartości wystąpił nieoczekiwany błąd.\n"
-"          Prawdopodobnie jest to z powodu niedopasowania wersji arkusza "
-"kalkulacyjnego."
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "An unexpected error occurred. Submit a support ticket at odoo.com/help."
 msgstr ""
 "Wystąpił nieoczekiwany błąd. Prześlij zgłoszenie wsparcia na odoo.com/help."
@@ -1399,8 +1390,8 @@ msgstr "Tablica lub zakres zawierający zestaw danych do rozważenia."
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid "Array result was not expanded because it would overwrite data in %s."
-msgstr "Wyniki tablicy nie były rozszerzone, ponieważ napisałoby to dane w %s."
+msgid "Array result was not expanded because it would overwrite data."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -4287,25 +4278,6 @@ msgstr "Funkcja [[FUNCTION_NAME]] nie znalazła żadnego wyniku."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
-"Function [[FUNCTION_NAME]] expects criteria_range and criterion to be in "
-"pairs."
-msgstr ""
-"Funkcja [[FUNCTION_NAME]] oczekuje, że criteria_range i criterion będą "
-"parami."
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
-"Function [[FUNCTION_NAME]] expects criteria_range to have the same dimension"
-msgstr ""
-"Funkcja [[FUNCTION_NAME]] oczekuje, że criteria_range będzie mieć ten sam "
-"wymiar"
-
-#. module: spreadsheet
-#. odoo-javascript
-#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
-msgid ""
 "Function [[FUNCTION_NAME]] expects number values for %s, but got a boolean."
 msgstr ""
 "Funkcja [[FUNCTION_NAME]] oczekuje wartości liczbowych dla %s, ale otrzymała "
@@ -4926,11 +4898,8 @@ msgstr "W ewaluacji [[FUNCTION_NAME]] nie można znaleźć '%s' w '%s'."
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
 "In [[FUNCTION_NAME]], the number of columns of the first matrix (%s) must be "
-"equal to the \n"
-"          number of rows of the second matrix (%s)."
+"equal to the           number of rows of the second matrix (%s)."
 msgstr ""
-"W [[FUNCTION_NAME]], liczba kolumn pierwszej matrycy (%s) musi być równa \n"
-"        liczbie rzędów drugiej matrycy (%s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6224,6 +6193,12 @@ msgstr "Data następnego kuponu po dacie rozliczenia."
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/hooks.js:0
+msgid "No"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.xml:0
 msgid "No Color"
 msgstr "Brak koloru"
@@ -6490,6 +6465,12 @@ msgstr "Średnia wartość liczbowa w zbiorze danych."
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "OFFSET evaluates to an out of bounds range."
 msgstr "Funkcja OFFSET prowadzi do zakresu poza granicami."
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/helpers/geo_json_service.js:0
+msgid "Oceania"
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -7440,7 +7421,8 @@ msgstr "Zwraca tekst, który pojawia się po danym podciągu lub separatorze."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "Returns text that occurs before a given substring or delimiter."
-msgstr "Zwraca tekst, który pojawia się przed danym podciągiem lub separatorem."
+msgstr ""
+"Zwraca tekst, który pojawia się przed danym podciągiem lub separatorem."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9279,13 +9261,13 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The delimiter (%s) must be not be empty."
-msgstr ""
+msgstr "Separator (%s) nie może być pusty."
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The delimiters cannot be empty values."
-msgstr ""
+msgstr "Separatory nie mogą być wartościami pustymi."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9306,6 +9288,8 @@ msgid ""
 "The desired instance of the delimiter after which we extract the text. A "
 "negative number searches from the end."
 msgstr ""
+"Żądana instancja separatora, po którym wyodrębniamy tekst. Liczba ujemna "
+"powoduje wyszukiwanie od końca."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9314,6 +9298,8 @@ msgid ""
 "The desired instance of the delimiter before which we extract the text. A "
 "negative number searches from the end."
 msgstr ""
+"Żądana instancja separatora, przed którym wyodrębniamy tekst. Liczba ujemna "
+"powoduje wyszukiwanie od końca."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9379,7 +9365,7 @@ msgstr "Efektywna roczna stopa procentowa."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The effective_rate (%s) must be strictly positive."
-msgstr ""
+msgstr "Wartość effective_rate (%s) musi być ściśle dodatnia."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9434,12 +9420,14 @@ msgstr "Wartość end_date (%s) musi być dodatnia lub zerowa."
 msgid ""
 "The end_period (%(end)s) must be smaller or equal to the life (%(life)s)."
 msgstr ""
+"Parametr end_period (%(end)s) musi być mniejszy lub równy parametrowi life (%"
+"(life)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The end_period (%s) must be positive or null."
-msgstr ""
+msgstr "Wartość end_period (%s) musi być dodatnia lub równa zero."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9515,7 +9503,7 @@ msgstr "Pole musi być liczbą lub ciągiem znaków"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/list/list_functions.js:0
 msgid "The field name should not be empty."
-msgstr ""
+msgstr "Nazwa pola nie powinna być pusta."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9542,6 +9530,7 @@ msgid ""
 "The first and second arguments of [[FUNCTION_NAME]] must be non-empty "
 "matrices."
 msgstr ""
+"Pierwszy i drugi argument [[FUNCTION_NAME]] muszą być macierzami niepustymi."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9724,6 +9713,7 @@ msgid ""
 "The first_period (%(first)s) must be smaller or equal to the last_period (%"
 "(last)s)."
 msgstr ""
+"First_period (%(first)s) musi być mniejszy lub równy last_period (%(last)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9830,13 +9820,13 @@ msgstr "Wynik funkcji [[FUNCTION_NAME]] musi być większy lub równy 01/01/1900
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The function code (%s) must be between 1 to 11 or 101 to 111."
-msgstr ""
+msgstr "Kod funkcji (%s) musi być pomiędzy 1 a 11 lub 101 a 111."
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The function to use in subtotal aggregation."
-msgstr ""
+msgstr "Funkcja do wykorzystania w agregacji sum częściowych."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9860,7 +9850,7 @@ msgstr "Wartość future_value (%s) musi być ściśle dodatnia."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The header row of a table can't be moved."
-msgstr ""
+msgstr "Wiersza nagłówkowego tabeli nie można przesuwać."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -9952,7 +9942,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The instance_num (%s) must not be zero."
-msgstr ""
+msgstr "Instance_num (%s) nie może wynosić zero."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10009,6 +9999,8 @@ msgid ""
 "The last_period (%(last)s) must be smaller or equal to the number_of_periods "
 "(%(nPeriods)s)."
 msgstr ""
+"Last_period (%(last)s) musi być mniejszy lub równy number_of_periods (%"
+"(nPeriods)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10065,6 +10057,8 @@ msgid ""
 "The maturity (%(maturity)s) must be strictly greater than the settlement (%"
 "(settlement)s)."
 msgstr ""
+"Dojrzałość (%(maturity)s) musi być ściśle większa niż osadzenie (%"
+"(settlement)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10230,7 +10224,7 @@ msgstr "Nominalna roczna stopa procentowa."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The nominal_rate (%s) must be strictly positive."
-msgstr ""
+msgstr "Wartość nominal_rate (%s) musi być ściśle dodatnia."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10320,7 +10314,7 @@ msgstr "Liczba okresów składanych w ciągu roku."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The number of days between start_date and end_date"
-msgstr ""
+msgstr "Liczba dni między start_date a end_date"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10328,7 +10322,7 @@ msgstr ""
 msgid ""
 "The number of days between start_date and end_date after subtracting whole "
 "months"
-msgstr ""
+msgstr "Liczba dni między start_date a end_date po odjęciu całych miesięcy"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10337,6 +10331,8 @@ msgid ""
 "The number of days between start_date and end_date, assuming start_date and "
 "end_date were no more than one year apart"
 msgstr ""
+"Liczba dni między start_date a end_date, zakładając, że start_date i "
+"end_date były nie dalej jak rok od siebie"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10507,7 +10503,7 @@ msgstr "Liczba, dla której ma zostać zwrócona wartość bezwzględna."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The number of whole months between start_date and end_date"
-msgstr ""
+msgstr "Liczba całych miesięcy między start_date a end_date"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10516,12 +10512,13 @@ msgid ""
 "The number of whole months between start_date and end_date after subtracting "
 "whole years"
 msgstr ""
+"Liczba całych miesięcy między start_date a end_date po odjęciu całych lat"
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The number of whole years between start_date and end_date"
-msgstr ""
+msgstr "Liczba całych lat między start_date a end_date"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10634,13 +10631,13 @@ msgstr "number_of_characters (%s) musi być dodatnia lub zerowa."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The number_of_periods (%s) must be different from zero."
-msgstr ""
+msgstr "Number_of_periods (%s) musi być różny od zera."
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The number_of_periods (%s) must be strictly positive."
-msgstr ""
+msgstr "Number_of_periods (%s) musi być ściśle dodatni."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10725,12 +10722,13 @@ msgstr ""
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The period (%(period)s) must be less than or equal life (%(life)s)."
 msgstr ""
+"Okres (%(period)s) musi być mniejszy lub równy życiu (life) (%(life)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The period (%(period)s) must be less than or equal to %(lifeLimit)s."
-msgstr ""
+msgstr "Okres (%(period)s) musi być mniejszy lub równy %(lifeLimit)s."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10760,7 +10758,7 @@ msgstr "Okres musi zawierać się w przedziale od 1 do number_of_periods (%s)"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The periods_by_year (%s) must be strictly positive."
-msgstr ""
+msgstr "Periods_by_year (%s) muszą być ściśle dodatnie."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10852,6 +10850,8 @@ msgid ""
 "The purchase_date (%(purchaseDate)s) must be before the first_period_end (%"
 "(firstPeriodEnd)s)."
 msgstr ""
+"Purchase_date (%(purchaseDate)s) musi być przed końcem first_period (%"
+"(firstPeriodEnd)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10911,7 +10911,7 @@ msgstr "Zakres jest nieprawidłowy"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The range is out of bounds."
-msgstr ""
+msgstr "Zakres jest poza granicami."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -10960,7 +10960,7 @@ msgstr "Zakres komórek, dla których ma zostać ocenione criterion1."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The range or reference for which you want the subtotal."
-msgstr ""
+msgstr "Zakres lub referencja, dla której chcesz uzyskać sumę częściową."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -11156,7 +11156,7 @@ msgstr "Odniesienie do komórki."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The regular expression pattern to match against the text."
-msgstr ""
+msgstr "Wzór wyrażenia regularnego do porównania z tekstem."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -11179,7 +11179,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "The return_mode (%s) must be 0, 1 or 2."
-msgstr ""
+msgstr "Wartość return_mode (%s) musi być 0, 1 lub 2."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -11249,6 +11249,8 @@ msgstr "Reguła jest nieprawidłowa z nieznanego powodu."
 msgid ""
 "The salvage (%(salvage)s) must be smaller or equal than the cost (%(cost)s)."
 msgstr ""
+"Wartość salvage (%(salvage)s) musi być mniejsza lub równa wartości cost (%"
+"(cost)s)."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13375,14 +13377,9 @@ msgstr "Czy dzielić tekst wokół każdego znaku zawartego w delimiterze."
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
 "Whether or not to remove empty text messages from the split results. The "
-"default behavior is to treat \n"
-"        consecutive delimiters as one (if TRUE). If FALSE, empty cells "
-"values are added between consecutive delimiters."
+"default behavior is to treat         consecutive delimiters as one (if "
+"TRUE). If FALSE, empty cells values are added between consecutive delimiters."
 msgstr ""
-"Czy usuwać puste wiadomości tekstowe z podzielonych wyników. Domyślne "
-"zachowanie to traktowanie\n"
-"         kolejnych ograniczników jako jednego (jeśli TRUE). Jeśli FALSE, "
-"wartości pustych komórek są dodawane pomiędzy kolejnymi ogranicznikami."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13608,6 +13605,12 @@ msgstr "Lata"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/hooks.js:0
+msgid "Yes"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/global_filters/helpers.js:0
 msgid "Yesterday"
 msgstr "Wczoraj"
@@ -13623,6 +13626,14 @@ msgstr "Nie można scalać komórek wewnątrz istniejącego filtra."
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "You cannot create overlapping tables."
 msgstr "Nie możesz tworzyć nakładających się na siebie tabeli."
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid ""
+"You copied content from a different version of the application. Only text "
+"and image content will be pasted."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -14013,6 +14024,12 @@ msgstr "jutro"
 
 #. module: spreadsheet
 #. odoo-javascript
+#: code:addons/spreadsheet/static/src/public_readonly_app/public_readonly.xml:0
+msgid "x"
+msgstr ""
+
+#. module: spreadsheet
+#. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "yesterday"
 msgstr "wczoraj"
@@ -14022,6 +14039,55 @@ msgstr "wczoraj"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "zero"
 msgstr "zero"
+
+#~ msgid ""
+#~ "An unexpected error occurred while pasting content.\n"
+#~ "          Additional information can be found in the browser console."
+#~ msgstr ""
+#~ "Podczas wklejania zawartości wystąpił nieoczekiwany błąd.\n"
+#~ "          Dodatkowe informacje znajdziesz w konsoli przeglądarki."
+
+#~ msgid ""
+#~ "An unexpected error occurred while pasting content.\n"
+#~ "          This is probably due to a spreadsheet version mismatch."
+#~ msgstr ""
+#~ "Podczas wklejania zawartości wystąpił nieoczekiwany błąd.\n"
+#~ "          Prawdopodobnie jest to z powodu niedopasowania wersji arkusza "
+#~ "kalkulacyjnego."
+
+#~ msgid ""
+#~ "Function [[FUNCTION_NAME]] expects criteria_range and criterion to be in "
+#~ "pairs."
+#~ msgstr ""
+#~ "Funkcja [[FUNCTION_NAME]] oczekuje, że criteria_range i criterion będą "
+#~ "parami."
+
+#~ msgid ""
+#~ "Function [[FUNCTION_NAME]] expects criteria_range to have the same "
+#~ "dimension"
+#~ msgstr ""
+#~ "Funkcja [[FUNCTION_NAME]] oczekuje, że criteria_range będzie mieć ten sam "
+#~ "wymiar"
+
+#~ msgid ""
+#~ "In [[FUNCTION_NAME]], the number of columns of the first matrix (%s) must "
+#~ "be equal to the \n"
+#~ "          number of rows of the second matrix (%s)."
+#~ msgstr ""
+#~ "W [[FUNCTION_NAME]], liczba kolumn pierwszej matrycy (%s) musi być "
+#~ "równa \n"
+#~ "        liczbie rzędów drugiej matrycy (%s)."
+
+#~ msgid ""
+#~ "Whether or not to remove empty text messages from the split results. The "
+#~ "default behavior is to treat \n"
+#~ "        consecutive delimiters as one (if TRUE). If FALSE, empty cells "
+#~ "values are added between consecutive delimiters."
+#~ msgstr ""
+#~ "Czy usuwać puste wiadomości tekstowe z podzielonych wyników. Domyślne "
+#~ "zachowanie to traktowanie\n"
+#~ "         kolejnych ograniczników jako jednego (jeśli TRUE). Jeśli FALSE, "
+#~ "wartości pustych komórek są dodawane pomiędzy kolejnymi ogranicznikami."
 
 #~ msgid ""
 #~ "Function [[FUNCTION_NAME]] expects number values for %s, but got a %s."

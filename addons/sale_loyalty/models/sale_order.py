@@ -786,7 +786,8 @@ class SaleOrder(models.Model):
                 points += self.coupon_point_ids.filtered(lambda p: p.coupon_id == coupon).points
             # Points already used by rewards
             points -= sum(self.order_line.filtered(lambda l: l.coupon_id == coupon).mapped('points_cost'))
-        points = coupon.currency_id.round(points)
+        if any(rule.reward_point_mode == 'money' for rule in coupon.program_id.rule_ids):
+            points = coupon.currency_id.round(points)
         return points
 
     def _add_points_for_coupon(self, coupon_points):
@@ -1453,7 +1454,10 @@ class SaleOrder(models.Model):
         coupon = False
         check_date = self._get_confirmed_tx_create_date()
 
-        if rule in self.code_enabled_rule_ids:
+        if (
+            rule in self.code_enabled_rule_ids
+            and program in self.order_line.filtered("is_reward_line").reward_id.program_id
+        ):
             return {'error': _("This promo code is already applied.")}
 
         # No trigger was found from the code, try to find a coupon

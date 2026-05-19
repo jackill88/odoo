@@ -166,6 +166,7 @@ class PosEdiXmlUBL21Jo(models.AbstractModel):
 
     def _add_pos_order_header_nodes(self, document_node, vals):
         pos_order = vals['pos_order']
+        pos_order._compute_l10n_jo_edi_pos_uuid()
         document_node.update({
             'cbc:ProfileID': {'_text': 'reporting:1.0'},
             'cbc:ID': {'_text': (pos_order.name or '').replace('/', '_')},
@@ -192,12 +193,11 @@ class PosEdiXmlUBL21Jo(models.AbstractModel):
 
     def _add_pos_order_accounting_customer_party_nodes(self, document_node, vals):
         super()._add_pos_order_accounting_customer_party_nodes(document_node, vals)
-        if not vals['is_refund']:
-            document_node['cac:AccountingCustomerParty'].update({
-                'cac:AccountingContact': {
-                    'cbc:Telephone': {'_text': self._sanitize_phone(vals['customer'].phone)}
-                },
-            })
+        document_node['cac:AccountingCustomerParty'].update({
+            'cac:AccountingContact': {
+                'cbc:Telephone': {'_text': self._sanitize_phone(vals['customer'].phone)}
+            },
+        })
 
     def _add_pos_order_seller_supplier_party_nodes(self, document_node, vals):
         document_node['cac:SellerSupplierParty'] = {
@@ -222,17 +222,17 @@ class PosEdiXmlUBL21Jo(models.AbstractModel):
         return {
             'cac:PartyIdentification': {
                 'cbc:ID': {'_text': commercial_partner.vat, 'schemeID': 'TN' if partner.country_code == 'JO' else 'PN'},
-            } if not vals['is_refund'] and is_customer else None,
+            } if is_customer else None,
             'cac:PostalAddress': self._get_address_node(vals),
             'cac:PartyTaxScheme': {
-                'cbc:CompanyID': {'_text': commercial_partner.vat} if not vals['is_refund'] or not is_customer else None,
+                'cbc:CompanyID': {'_text': commercial_partner.vat},
                 'cac:TaxScheme': {
-                    'cbc:ID': {'_text': 'VAT'}
+                    'cbc:ID': {'_text': 'VAT'},
                 },
             },
             'cac:PartyLegalEntity': {
                 'cbc:RegistrationName': {'_text': commercial_partner.name},
-            } if not vals['is_refund'] or not is_customer else None,
+            },
         }
 
     def _get_address_node(self, vals):
@@ -241,8 +241,8 @@ class PosEdiXmlUBL21Jo(models.AbstractModel):
         state = partner['state_id']
 
         return {
-            'cbc:PostalZone': {'_text': partner.zip} if not vals['is_refund'] else None,
-            'cbc:CountrySubentityCode': {'_text': state.code} if not vals['is_refund'] else None,
+            'cbc:PostalZone': {'_text': partner.zip},
+            'cbc:CountrySubentityCode': {'_text': state.code},
             'cac:Country': {
                 'cbc:IdentificationCode': {'_text': country.code},
             },

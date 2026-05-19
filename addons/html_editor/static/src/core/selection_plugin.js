@@ -219,6 +219,8 @@ export class SelectionPlugin extends Plugin {
         "isSelectionInEditable",
         "isNodeEditable",
         "selectAroundNonEditable",
+        "getCachedSelection",
+        "setCachedSelection",
     ];
     /** @type {import("plugins").EditorResources} */
     resources = {
@@ -283,11 +285,34 @@ export class SelectionPlugin extends Plugin {
             this.addDomListener(document, "pointerdown", unFocusEditable, { capture: true });
         }
         this.preservedCursors = [];
+        // Calling the native `focus` method of the editable element, even with
+        // `preventScroll: true`, would reset the selection at the start of the
+        // editable. This would, in turn, trigger a selectionchange event and,
+        // down the line, a scroll to the position of the selection, so to the
+        // top of the document. Calling focusEditable instead will restore the
+        // correct editable selection and prevent scrolling when not needed.
+        this.editableOriginalFocus = this.editable.focus;
+        this.editable.focus = () => this.focusEditable();
+    }
+
+    destroy() {
+        if (this.editableOriginalFocus) {
+            this.editable.focus = this.editableOriginalFocus;
+        }
+        super.destroy();
+    }
+
+    getCachedSelection() {
+        return this._cachedSelection;
+    }
+
+    setCachedSelection(value) {
+        this._cachedSelection = value;
     }
 
     selectAll() {
         const selection = this.getEditableSelection();
-        const containerSelector = "#wrap > *, .oe_structure > *, [contenteditable]";
+        const containerSelector = '#wrap > *, .oe_structure > *, [contenteditable="true"]';
         const container = selection && closestElement(selection.anchorNode, containerSelector);
         const [anchorNode, anchorOffset] = getDeepestEditablePosition(container, 0);
         const [focusNode, focusOffset] = getDeepestEditablePosition(container, nodeSize(container));
@@ -339,6 +364,12 @@ export class SelectionPlugin extends Plugin {
      * Update the active selection to the current selection in the editor.
      */
     updateActiveSelection() {
+        if (this.getCachedSelection()) {
+            // `before_input_handler` may change the selection, which would
+            // invalidate the cached selection. Keep it in sync as long as
+            // the cache is active.
+            this.setCachedSelection(this.document.getSelection());
+        }
         this.previousActiveSelection = this.activeSelection;
         // getSelectionData sets this.activeSelection to the current selection
         const selectionData = this.getSelectionData();
@@ -497,7 +528,7 @@ export class SelectionPlugin extends Plugin {
      * @return { SelectionData }
      */
     getSelectionData() {
-        const selection = this.document.getSelection();
+        const selection = this.getCachedSelection() || this.document.getSelection();
         const documentSelectionIsInEditable = selection && this.isSelectionInEditable(selection);
         let collapsed;
         const documentSelection =
@@ -807,20 +838,36 @@ export class SelectionPlugin extends Plugin {
 
     areNodeContentsFullySelected(node) {
         const selection = this.getEditableSelection();
+        // In empty blocks (e.g. <p><br></p>), Ctrl+A produces a collapsed
+        // DOM selection, so no actual range is selected.
+        if (selection.isCollapsed) {
+            return false;
+        }
         const range = new Range();
         range.setStart(selection.startContainer, selection.startOffset);
-        range.setEnd(selection.endContainer, selection.endOffset);
+        // Adjust the range end if it ends with a <br>.
+        const { endContainer, endOffset } = this.getEditableSelection();
+        if (endContainer.childNodes?.[endOffset]?.nodeName === "BR") {
+            range.setEnd(endContainer, endOffset + 1);
+        } else {
+            range.setEnd(endContainer, endOffset);
+        }
+
+        // Custom rules.
+        if (
+            this.getResource("fully_selected_node_predicates")?.some((cb) =>
+                cb(node, selection, range)
+            )
+        ) {
+            return true;
+        }
 
         const firstLeafNode = firstLeaf(node);
         const lastLeafNode = lastLeaf(node);
+        // Default rule: range must cover the full node.
         return (
-            // Custom rules
-            this.getResource("fully_selected_node_predicates").some((cb) =>
-                cb(node, selection, range)
-            ) ||
-            // Default rule
-            (range.isPointInRange(firstLeafNode, 0) &&
-                range.isPointInRange(lastLeafNode, nodeSize(lastLeafNode)))
+            range.isPointInRange(firstLeafNode, 0) &&
+            range.isPointInRange(lastLeafNode, nodeSize(lastLeafNode))
         );
     }
 
@@ -1118,11 +1165,19 @@ export class SelectionPlugin extends Plugin {
     }
 
     focusEditable() {
-        const { editableSelection, currentSelectionIsInEditable } = this.getSelectionData();
-        if (this.editable.contains(this.document.activeElement) && currentSelectionIsInEditable) {
-            // Editor has focus — nothing to do.
+        const selection = this.document.getSelection();
+        const documentSelectionIsInEditable = selection && this.isSelectionInEditable(selection);
+        if (this.editable.contains(this.document.activeElement) && documentSelectionIsInEditable) {
+            // Editor has focus — nothing to do. Unless the current active
+            // element is a textarea, in which case we want to focus the
+            // editable to update the selection to the editable.
+            if (this.document.activeElement.tagName === "TEXTAREA") {
+                this.editableOriginalFocus.call(this.editable);
+            }
             return;
         }
+
+        const { editableSelection, currentSelectionIsInEditable } = this.getSelectionData();
 
         // Focusing the closest editable element is required since, in the website
         // 'this.editable' itself is contenteditable="false`.
@@ -1130,7 +1185,11 @@ export class SelectionPlugin extends Plugin {
             editableSelection.commonAncestorContainer,
             (el) => el.getAttribute("contenteditable") === "true"
         );
-        closestEditable?.focus({ preventScroll: true });
+        if (closestEditable === this.editable) {
+            this.editableOriginalFocus.call(this.editable, { preventScroll: true });
+        } else {
+            closestEditable?.focus({ preventScroll: true });
+        }
 
         // If selection is inside a non-editable element, focusing editor might
         // move cursor to different position. so reapply the last selection.

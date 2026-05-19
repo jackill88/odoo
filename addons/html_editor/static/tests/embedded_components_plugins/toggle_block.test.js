@@ -569,6 +569,94 @@ describe("deleteForward applied to toggle", () => {
             `)
         );
     });
+    test("toggle closed, end of title: should not do anything if sibling node is not available", async () => {
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <div data-embedded="toggleBlock" data-oe-protected="true" data-embedded-props='{ "toggleBlockId": "1" }' contenteditable="false">
+                    <div data-embedded-editable="title">
+                        <p>HelloWorld[]</p>
+                    </div>
+                    <div data-embedded-editable="content">
+                        <p>invisible</p>
+                    </div>
+                </div>
+            `),
+            {
+                config: getConfig([toggleBlockEmbedding]),
+            }
+        );
+        await embeddedToggleMountedPromise;
+        deleteForward(editor);
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <div data-embedded="toggleBlock" data-oe-protected="true" data-embedded-props='{ "toggleBlockId": "1" }' contenteditable="false">
+                    <div class="d-flex flex-row align-items-center">
+                        <button class="btn p-0 border-0 align-items-center justify-content-center btn-light" type="button">
+                            <i class="fa align-self-center fa-caret-right"></i>
+                        </button>
+                        <div class="flex-fill ms-1">
+                            <div data-embedded-editable="title" data-oe-protected="false" contenteditable="true">
+                                <p>HelloWorld[]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ps-4 ms-1 d-none">
+                        <div data-embedded-editable="content" data-oe-protected="false" contenteditable="true">
+                            <p>invisible</p>
+                        </div>
+                    </div>
+                </div>
+                <p data-selection-placeholder=""><br></p>
+            `)
+        );
+    });
+    test("toggle open, end of title: should append sibling text node content to title", async () => {
+        browser.sessionStorage.setItem(`html_editor.ToggleBlock1.showContent`, "true");
+        const { editor, el } = await setupEditor(
+            unformat(`
+                <div data-embedded="toggleBlock" data-oe-protected="true" data-embedded-props='{ "toggleBlockId": "1" }' contenteditable="false">
+                    <div data-embedded-editable="title">
+                        <p>HelloWorld[]</p>
+                    </div>
+                    <div data-embedded-editable="content">
+                        test
+                        <table><tbody><tr><td>a</td></tr></tbody></table>
+                    </div>
+                </div>
+            `),
+            {
+                config: getConfig([toggleBlockEmbedding]),
+            }
+        );
+        await embeddedToggleMountedPromise;
+        deleteForward(editor);
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p data-selection-placeholder=""><br></p>
+                <div data-embedded="toggleBlock" data-oe-protected="true" data-embedded-props='{ "toggleBlockId": "1" }' contenteditable="false">
+                    <div class="d-flex flex-row align-items-center">
+                        <button class="btn p-0 border-0 align-items-center justify-content-center btn-light" type="button">
+                            <i class="fa align-self-center fa-caret-down"></i>
+                        </button>
+                        <div class="flex-fill ms-1">
+                            <div data-embedded-editable="title" data-oe-protected="false" contenteditable="true">
+                                <p>HelloWorld[]test</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ps-4 ms-1">
+                        <div data-embedded-editable="content" data-oe-protected="false" contenteditable="true">
+                            <p data-selection-placeholder=""><br></p>
+                            <table><tbody><tr><td>a</td></tr></tbody></table>
+                            <p data-selection-placeholder=""><br></p>
+                        </div>
+                    </div>
+                </div>
+                <p data-selection-placeholder=""><br></p>
+            `)
+        );
+    });
 });
 describe("Enter applied to toggle title", () => {
     test("start of title: should create new toggle before", async () => {
@@ -776,6 +864,58 @@ describe("Enter applied to toggle title", () => {
             unformat(`
                 <p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>
                 <p>asdf</p>
+            `)
+        );
+    });
+    test("empty title with inline elements: should explode toggle", async () => {
+        browser.sessionStorage.setItem(`html_editor.ToggleBlock1.showContent`, "false");
+        const { editor, el } = await setupEditor(
+            unformat(
+                `<div data-embedded="toggleBlock" data-oe-protected="true" contenteditable="false" data-embedded-props='{ "toggleBlockId": "1" }'>
+                    <div data-embedded-editable="title">
+                        <p><strong>[]\u200B</strong></p>
+                    </div>
+                    <div data-embedded-editable="content">
+                        <p><br></p>
+                    </div>
+                </div>
+            `
+            ),
+            {
+                config: getConfig([toggleBlockEmbedding]),
+            }
+        );
+        await embeddedToggleMountedPromise;
+        splitBlock(editor);
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>
+            `)
+        );
+    });
+    test("empty title with rtl: should preserve direction", async () => {
+        browser.sessionStorage.setItem(`html_editor.ToggleBlock1.showContent`, "false");
+        const { editor, el } = await setupEditor(
+            unformat(
+                `<div data-embedded="toggleBlock" data-oe-protected="true" dir="rtl" contenteditable="false" data-embedded-props='{ "toggleBlockId": "1" }'>
+                    <div data-embedded-editable="title">
+                        <p>[]<br></p>
+                    </div>
+                    <div data-embedded-editable="content">
+                        <p><br></p>
+                    </div>
+                </div>
+            `
+            ),
+            {
+                config: getConfig([toggleBlockEmbedding]),
+            }
+        );
+        await embeddedToggleMountedPromise;
+        splitBlock(editor);
+        expect(getContent(el)).toBe(
+            unformat(`
+                <p dir="rtl" o-we-hint-text='Type "/" for commands' class="o-we-hint">[]<br></p>
             `)
         );
     });
