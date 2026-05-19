@@ -324,6 +324,8 @@ class SnailmailLetter(models.Model):
             return _('One or more required fields are empty.')
         if error == 'FORMAT_ERROR':
             return _('The attachment of the letter could not be sent. Please check its content and contact the support if the problem persists.')
+        if error == 'TOO_MANY_PAGES':
+            return _('The document to be sent exceeds the maximum allowed limit of 8 pages.')
         else:
             return _('An unknown error happened. Please contact the support.')
         return error
@@ -551,6 +553,7 @@ class SnailmailLetter(models.Model):
         out = PdfFileWriter()
         for page in curr_pdf.pages:
             page.mergePage(new_pdf.getPage(0))
+            page.compressContentStreams()
             out.addPage(page)
         out_stream = io.BytesIO()
         out.write(out_stream)

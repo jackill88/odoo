@@ -2,6 +2,7 @@ import { Plugin } from "@html_editor/plugin";
 import { closestBlock, isBlock } from "@html_editor/utils/blocks";
 import {
     removeClass,
+    removeEmptyTextNodes,
     removeStyle,
     toggleClass,
     unwrapContents,
@@ -345,7 +346,7 @@ export class ListPlugin extends Plugin {
             return this.baseContainerToList(element, mode);
         }
         // @todo @phoenix: check for callbacks registered as resources instead?
-        if (element.matches("td, th, li.nav-item")) {
+        if (element.matches("td, th, li.nav-item, blockquote")) {
             return this.blockContentsToList(element, mode);
         }
         let list;
@@ -501,7 +502,7 @@ export class ListPlugin extends Plugin {
             baseContainerNodeName: this.dependencies.baseContainer.getDefaultNodeName(),
             cursors,
         });
-        callbacksForCursorUpdate.unwrap(element);
+        cursors.update(callbacksForCursorUpdate.unwrap(element));
         unwrapContents(element);
         cursors.restore();
     }
@@ -1110,6 +1111,9 @@ export class ListPlugin extends Plugin {
         }
         const cursors = this.dependencies.selection.preserveSelection();
         for (const listItem of listItems) {
+            // Remove empty text nodes without breaking the current selection.
+            removeEmptyTextNodes(listItem, cursors);
+
             if (this.dependencies.selection.areNodeContentsFullySelected(listItem)) {
                 for (const node of [
                     listItem,
@@ -1185,6 +1189,9 @@ export class ListPlugin extends Plugin {
             if (!hasOnlyBaseBlocks || (!applyStyle && !hasExistingFontSize)) {
                 continue;
             }
+
+            // Remove empty text nodes without breaking the current selection.
+            removeEmptyTextNodes(listItem, cursors);
 
             if (this.dependencies.selection.areNodeContentsFullySelected(listItem)) {
                 for (const node of [
