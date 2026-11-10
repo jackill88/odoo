@@ -14,6 +14,15 @@ def _has_vat(vat):
     return bool(vat and len(vat) > 1)
 
 
+def _get_customer_vat(commercial_partner):
+    # SPV checks an identifier without country prefix as a Romanian CUI
+    vat = commercial_partner.vat
+    country_code = commercial_partner.country_code
+    if country_code and country_code != 'RO' and not vat[:2].isalpha():
+        return ('EL' if country_code == 'GR' else country_code) + vat
+    return vat
+
+
 class AccountEdiXmlUbl_Ro(models.AbstractModel):
     _name = 'account.edi.xml.ubl_ro'
     _inherit = ["account.edi.xml.ubl_bis3"]
@@ -103,7 +112,7 @@ class AccountEdiXmlUbl_Ro(models.AbstractModel):
         if not _has_vat(commercial_partner.vat):
             company_id = DEFAULT_VAT
         else:
-            company_id = commercial_partner.vat
+            company_id = _get_customer_vat(commercial_partner)
 
         vals['party_node']['cac:PartyTaxScheme'] = [{
             'cbc:CompanyID': {'_text': company_id},
@@ -126,6 +135,28 @@ class AccountEdiXmlUbl_Ro(models.AbstractModel):
                     'schemeID': None,
                 },
             }]
+        elif (vat := _get_customer_vat(commercial_partner)) != commercial_partner.vat:
+            for legal_entity_node in vals['party_node']['cac:PartyLegalEntity']:
+                if legal_entity_node['cbc:CompanyID']['_text'] == commercial_partner.vat:
+                    legal_entity_node['cbc:CompanyID']['_text'] = vat
+
+    def _ubl_add_line_item_name_description_nodes(self, vals):
+        # EXTENDS account.edi.ubl
+        super()._ubl_add_line_item_name_description_nodes(vals)
+        item_node = vals['item_node']
+
+        if name := item_node['cbc:Name'] and item_node['cbc:Name'].get('_text'):
+            item_node['cbc:Name']['_text'] = name[:100]
+        if description := item_node['cbc:Description'] and item_node['cbc:Description'].get('_text'):
+            item_node['cbc:Description']['_text'] = description[:200]
+
+    def _ubl_add_notes_nodes(self, vals):
+        # EXTENDS account.edi.xml.ubl_bis3
+        super()._ubl_add_notes_nodes(vals)
+        document_node = vals['document_node']
+
+        if note := document_node['cbc:Note'].get('_text'):
+            document_node['cbc:Note']['_text'] = note[:300]
 
     # -------------------------------------------------------------------------
     # EXPORT: Constraints

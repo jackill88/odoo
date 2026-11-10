@@ -21,15 +21,18 @@
 # Anna, 2023
 # JanaAvalah, 2023
 # Eneli Õigus <enelioigus@gmail.com>, 2023
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Odoo Translation Bot <c3p@odoo.com>, 2026.
+# Eelma <karin.eelma@impactic.ee>, 2026.
+# Kristina Pešehodko <kristina@avalah.ee>, 2026.
+# Erik Köster <erik@officeplus.ee>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-24 17:37+0000\n"
-"PO-Revision-Date: 2026-04-13 20:52+0000\n"
-"Last-Translator: Odoo Translation Bot <c3p@odoo.com>\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-10-08 13:33+0000\n"
+"Last-Translator: Erik Köster <erik@officeplus.ee>\n"
 "Language-Team: Estonian <https://translate.odoo.com/projects/odoo-19/web/et/"
 ">\n"
 "Language: et\n"
@@ -37,7 +40,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.16.2\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: web
 #. odoo-javascript
@@ -1756,6 +1759,7 @@ msgstr ""
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/core/debug/debug_menu_items.xml:0
 #: code:addons/web/static/src/core/errors/error_dialogs.js:0
 #: code:addons/web/static/src/views/fields/copy_clipboard/copy_clipboard_field.js:0
 msgid "Copied"
@@ -1766,6 +1770,12 @@ msgstr "Kopeeritud"
 #: code:addons/web/static/src/views/fields/copy_clipboard/copy_clipboard_field.js:0
 msgid "Copy"
 msgstr "Koopia"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/core/debug/debug_menu_items.xml:0
+msgid "Copy Arch"
+msgstr ""
 
 #. module: web
 #. odoo-javascript
@@ -4209,12 +4219,7 @@ msgstr "Kohtumise teema"
 
 #. module: web
 #: model_terms:ir.ui.view,arch_db:web.config_speedscope_index
-msgid "Memory limit (in bytes)"
-msgstr ""
-
-#. module: web
-#: model_terms:ir.ui.view,arch_db:web.config_speedscope_index
-msgid "Memory profile"
+msgid "Memory (heuristic)"
 msgstr ""
 
 #. module: web
@@ -4506,7 +4511,7 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web/static/src/webclient/user_menu/user_menu_items.js:0
 msgid "My Preferences"
-msgstr ""
+msgstr "Minu eelistused"
 
 #. module: web
 #. odoo-javascript
@@ -5196,7 +5201,7 @@ msgstr "PDF fail"
 #: model_terms:ir.ui.view,arch_db:web.external_layout_striped
 #: model_terms:ir.ui.view,arch_db:web.external_layout_wave
 msgid "Page <span class=\"page\"/> / <span class=\"topage\"/>"
-msgstr ""
+msgstr "Lehekülg: <span class=\"page\"/> / <span class=\"topage\"/>"
 
 #. module: web
 #. odoo-javascript
@@ -5343,7 +5348,7 @@ msgstr "Palun skaneerige uuesti!"
 #. module: web
 #: model_terms:ir.ui.view,arch_db:web.brand_promotion_message
 msgid "Powered by %s%s"
-msgstr "Kiri saadetud läbi %s%s"
+msgstr "Powered by %s%s"
 
 #. module: web
 #: model_terms:ir.ui.view,arch_db:web.login_layout
@@ -5612,7 +5617,7 @@ msgstr ""
 "Kas oled valmis kustutama oma kirjet? Olete kindlad?\n"
 "See on kadunud igaveseks!\n"
 "\n"
-"Mõelde kaks korda enne \"kustuta\" nupu vajutamist!"
+"Mõelge kaks korda enne \"kustuta\" nupu vajutamist!"
 
 #. module: web
 #. odoo-javascript
@@ -5993,6 +5998,12 @@ msgstr "Salvesta manuaalselt"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/views/fields/translation_button.js:0
+msgid "Save this record and its parent to translate"
+msgstr ""
+
+#. module: web
+#. odoo-javascript
 #: code:addons/web/static/src/views/fields/many2one/many2one.xml:0
 msgid "Scan barcode"
 msgstr "Skaneeri triipkood"
@@ -6027,6 +6038,12 @@ msgstr "Otsi"
 #: code:addons/web/static/src/views/calendar/calendar_filter_section/calendar_filter_section.js:0
 msgid "Search More..."
 msgstr "Otsi veel..."
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/reference/reference_field.js:0
+msgid "Search a record..."
+msgstr ""
 
 #. module: web
 #. odoo-javascript
@@ -6331,6 +6348,12 @@ msgstr "Shinkansen"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 msgid "Shinto"
 msgstr "Shinto"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/webclient/user_menu/user_menu_items.js:0
+msgid "Shortcuts"
+msgstr "Otseteed"
 
 #. module: web
 #. odoo-javascript
@@ -6700,17 +6723,6 @@ msgid "Text file"
 msgstr "Teksti fail"
 
 #. module: web
-#: model:ir.model.fields,help:web.field_base_document_layout__vat
-msgid ""
-"The Tax Identification Number. Values here will be validated based on the "
-"country format. You can use '/' to indicate that the partner is not subject "
-"to tax."
-msgstr ""
-"Maksukohustuslase number. Väärtused valideeritakse vastavalt riigi "
-"formaadile. Saate kasutada '/' näitamaks, et partner ei ole "
-"maksukohustuslane."
-
-#. module: web
 #. odoo-python
 #: code:addons/web/controllers/action.py:0
 msgid "The action “%s” does not exist"
@@ -6732,6 +6744,14 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/web/static/src/core/install_scoped_app/install_scoped_app.xml:0
 msgid "The app seems to be installed on your device"
+msgstr ""
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/search/search_arch_parser.js:0
+msgid ""
+"The autocomplete value for %(field)s has not been found: the record with id %"
+"(id)s doesn't seem to exist"
 msgstr ""
 
 #. module: web
@@ -6952,6 +6972,12 @@ msgstr "Saaja"
 #: code:addons/web/static/src/views/fields/float_time/float_time_field.js:0
 msgid "Time"
 msgstr "Aeg"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/webclient/debug/profiling/profiling_item.xml:0
+msgid "Time Limit (seconds)"
+msgstr ""
 
 #. module: web
 #. odoo-javascript
@@ -7787,6 +7813,11 @@ msgstr ""
 #. odoo-python
 #: code:addons/web/models/properties_base_definition.py:0
 msgid "You can not read that field definition."
+msgstr ""
+
+#. module: web
+#: model:ir.model.fields,help:web.field_base_document_layout__vat
+msgid "You can use '/' to indicate that the customer has no Tax ID."
 msgstr ""
 
 #. module: web
@@ -11642,7 +11673,7 @@ msgstr "dango"
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 msgid "dark"
-msgstr "dark"
+msgstr "tume"
 
 #. module: web
 #. odoo-javascript
@@ -16651,7 +16682,7 @@ msgstr "lifter"
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 msgid "light"
-msgstr "light"
+msgstr "hele"
 
 #. module: web
 #. odoo-javascript
@@ -19040,7 +19071,6 @@ msgstr "oops"
 #. module: web
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
-#: model_terms:ir.ui.view,arch_db:web.config_speedscope_index
 msgid "open"
 msgstr "ava"
 
@@ -19219,7 +19249,7 @@ msgstr "outbox tray"
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 msgid "outgoing"
-msgstr "outgoing"
+msgstr "väljuv"
 
 #. module: web
 #. odoo-javascript
@@ -26868,6 +26898,15 @@ msgstr ""
 msgid "空"
 msgstr ""
 
+#~ msgid ""
+#~ "The Tax Identification Number. Values here will be validated based on the "
+#~ "country format. You can use '/' to indicate that the partner is not "
+#~ "subject to tax."
+#~ msgstr ""
+#~ "Maksukohustuslase number. Väärtused valideeritakse vastavalt riigi "
+#~ "formaadile. Saate kasutada '/' näitamaks, et partner ei ole "
+#~ "maksukohustuslane."
+
 #~ msgid "00"
 #~ msgstr "00"
 
@@ -27458,9 +27497,6 @@ msgstr ""
 
 #~ msgid "Share with all users"
 #~ msgstr "Jaga kõigi kasutajatega"
-
-#~ msgid "Shortcuts"
-#~ msgstr "Otseteed"
 
 #~ msgid "Size:"
 #~ msgstr "Suurus:"

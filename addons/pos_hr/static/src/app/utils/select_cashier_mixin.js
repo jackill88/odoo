@@ -74,7 +74,7 @@ export function useCashierSelector({ exclusive, onScan } = { onScan: () => {}, e
 
         let employee = false;
         const allEmployees = pos.models["hr.employee"].filter(
-            (employee) => employee.id !== pos.getCashier()?.id
+            (employee) => employee._role && employee.id !== pos.getCashier()?.id
         );
         const pinMatchEmployees = allEmployees.filter(
             (employee) => !pin || Sha1.hash(pin) === employee._pin
@@ -118,12 +118,11 @@ export function useCashierSelector({ exclusive, onScan } = { onScan: () => {}, e
         }
 
         if (login && employee) {
-            pos.hasLoggedIn = true;
-            const result = pos.setCashier(employee);
-
-            if (!result) {
+            if (!pos.canLoginCashier(employee)) {
                 return false;
             }
+            pos.hasLoggedIn = true;
+            pos.setCashier(employee);
         }
 
         const currentScreen = pos.router.state.current;

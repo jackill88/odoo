@@ -305,7 +305,17 @@ export class ImagePlugin extends Plugin {
             downloadUrl: targetedImg.src,
         };
         this.document.getSelection().collapseToEnd();
-        this.fileViewer.open(fileModel);
+        this.document.activeElement.blur();
+        const onClose = () => {
+            this.dependencies.selection.focusEditable();
+        };
+        this.fileViewer.open(fileModel, undefined, onClose);
+        Promise.resolve().then(() => {
+            // Clear the selection after editor focus has been restored by
+            // onButtonClick(), otherwise the selection reappears.
+            const selection = this.document.getSelection();
+            selection.removeAllRanges();
+        });
     }
 
     deleteImage() {

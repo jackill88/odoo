@@ -2,17 +2,17 @@
 # This file contains the translation of the following modules:
 # * spreadsheet
 #
-# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025.
+# "Dylan Kiss (dyki)" <dyki@odoo.com>, 2025, 2026.
 # "Larissa Manderfeld (lman)" <lman@odoo.com>, 2025, 2026.
-# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025.
-# Weblate <noreply-mt-weblate@weblate.org>, 2025.
+# "Malaz Siddig Elsayed Abuidris (msea)" <msea@odoo.com>, 2025, 2026.
+# Weblate <noreply-mt-weblate@weblate.org>, 2025, 2026.
 # Jake Rigley <leo.burk@careline.de>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-24 17:37+0000\n"
-"PO-Revision-Date: 2026-05-02 09:52+0000\n"
+"POT-Creation-Date: 2026-10-24 17:38+0000\n"
+"PO-Revision-Date: 2026-09-02 14:11+0000\n"
 "Last-Translator: \"Larissa Manderfeld (lman)\" <lman@odoo.com>\n"
 "Language-Team: German <https://translate.odoo.com/projects/odoo-19/"
 "spreadsheet/de/>\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.17\n"
+"X-Generator: Weblate 2026.8.1\n"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -1912,6 +1912,13 @@ msgstr "Es können nicht alle Zeilen eines Blatts verborgen werden."
 msgid "Cannot open the link because the linked sheet is hidden."
 msgstr ""
 "Konnte den Link nicht öffnen, da das verbundene Blatt ausgeblendet wird."
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
+msgid ""
+"Cannot perform this action on merged cells. Unmerge the cells and try again."
+msgstr ""
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -4953,6 +4960,9 @@ msgid ""
 "In [[FUNCTION_NAME]], the number of columns of the first matrix (%s) must be "
 "equal to the           number of rows of the second matrix (%s)."
 msgstr ""
+"In [[FUNCTION_NAME]] muss die Anzahl der Spalten der ersten Matrix (%s) "
+"gleich der \n"
+"        Anzahl der Zeilen der zweiten Matrix (%s) sein."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -6252,7 +6262,7 @@ msgstr "Nächstes Kupondatum nach dem Abrechnungsdatum."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/hooks.js:0
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -7374,6 +7384,12 @@ msgstr "Elemente, die genau einmal vorkommen, zurückgeben"
 #: code:addons/spreadsheet/static/src/pivot/pivot_functions.js:0
 msgid "Return the current value of a spreadsheet filter."
 msgstr "Gibt den aktuellen Wert eines Tabellenkalkulationsfilters aus."
+
+#. module: spreadsheet
+#. odoo-javascript
+#: code:addons/spreadsheet/static/src/pivot/pivot_functions.js:0
+msgid "Return the label of the current value of a spreadsheet filter."
+msgstr "Gibt die Bezeichnung des aktuellen Werts eines Tabellenfilters zurück."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -12649,11 +12665,9 @@ msgstr "Dieser Vorgang ist bei Mehrfachauswahlen nicht zulässig."
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid ""
-"This operation is not possible due to a merge. Please remove the merges "
-"first than try again."
+"This operation would cause tables to overlap. Move or remove the conflicting "
+"table and try again."
 msgstr ""
-"Dieser Vorgang ist aufgrund einer Zusammenführung nicht möglich. Bitte "
-"entfernen Sie zuerst die Zusammenführungen und versuchen Sie es dann erneut."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13073,7 +13087,7 @@ msgstr "Bis %(to)s"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/helpers/constants.js:0
 msgid "Untitled spreadsheet"
-msgstr "Unbenanntes Tabellenblatt"
+msgstr "Unbenannte Tabellenkalkulation"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13584,6 +13598,11 @@ msgid ""
 "default behavior is to treat         consecutive delimiters as one (if "
 "TRUE). If FALSE, empty cells values are added between consecutive delimiters."
 msgstr ""
+"Ob leere Textnachrichten aus den Ergebnissen der Teilung entfernt werden "
+"sollen oder nicht. Das Standardverhalten ist es, \n"
+"        aufeinanderfolgende Trennzeichen als eins zu behandeln (falls TRUE). "
+"Bei FALSE werden die Werte leerer Zellen zwischen aufeinanderfolgenden "
+"Trennzeichen hinzugefügt."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13817,7 +13836,7 @@ msgstr "Jahre"
 #. odoo-javascript
 #: code:addons/spreadsheet/static/src/hooks.js:0
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -13845,6 +13864,8 @@ msgid ""
 "You copied content from a different version of the application. Only text "
 "and image content will be pasted."
 msgstr ""
+"Sie haben Inhalte aus einer anderen Version der App kopiert. Es werden nur "
+"Text- und Bildinhalte eingefügt."
 
 #. module: spreadsheet
 #. odoo-javascript
@@ -14263,6 +14284,14 @@ msgstr "gestern"
 #: code:addons/spreadsheet/static/src/o_spreadsheet/o_spreadsheet.js:0
 msgid "zero"
 msgstr "null"
+
+#~ msgid ""
+#~ "This operation is not possible due to a merge. Please remove the merges "
+#~ "first than try again."
+#~ msgstr ""
+#~ "Dieser Vorgang ist aufgrund einer Zusammenführung nicht möglich. Bitte "
+#~ "entfernen Sie zuerst die Zusammenführungen und versuchen Sie es dann "
+#~ "erneut."
 
 #~ msgid ""
 #~ "An unexpected error occurred while pasting content.\n"

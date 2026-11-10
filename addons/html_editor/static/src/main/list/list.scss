@@ -9,49 +9,6 @@
     }
 }
 
-// Checklist
-ul.o_checklist {
-    > li {
-        list-style: none;
-        position: relative;
-
-        &:not(.oe-nested):before {
-            content: '';
-            position: absolute;
-            left: -20px;
-            display: block;
-            height: 14px;
-            width: 14px;
-            top: 1px;
-            border: 1px solid;
-            cursor: pointer;
-        }
-        &.o_checked {
-            &::before {
-                content: "✓";
-                transition: opacity .5s;
-                position: absolute;
-                left: -18px;
-                top: -1px;
-                opacity: 1;
-            }
-
-            &:has(ul, ol)::before {
-                opacity: 0.5;
-            }
-
-            &:not(:has(ul, ol)) {
-                text-decoration: line-through;
-                opacity: 0.5;
-            }
-            &:has(ul, ol) > :not(ul, ol) {
-                text-decoration: line-through;
-                opacity: 0.5;
-            }
-        }
-    }
-}
-
 .odoo-editor-editable {
     li {
         &[style*="color"],
@@ -59,6 +16,40 @@ ul.o_checklist {
             font[class*="bg-"]:not([class*="text-"]):not([style*="color"]) {
                 color: inherit !important;
             }
+        }
+    }
+}
+
+#wrapwrap, // avoid duplicating in portal
+.o_mass_mailing_value, // avoid duplicating in mass_mailing
+.o_field_html {
+    .o-float-start-parent {
+        & ~ ul, & ~ ol {
+            display: flow-root;
+        }
+        .o_we_hint::after {
+            display: none;
+        }
+    }
+
+    .o-float-end-parent {
+        & ~ ul, & ~ ol {
+            &[dir] {
+                display: flow-root;
+            }
+        }
+        .o_we_hint::after {
+            display: none;
+        }
+    }
+
+    li .float-start {
+        float: unset !important;
+    }
+
+    ul, ol {
+        &[dir] li .float-end {
+            float: unset !important;
         }
     }
 }

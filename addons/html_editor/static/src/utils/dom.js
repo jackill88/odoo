@@ -148,12 +148,17 @@ export function removeClass(element, ...classNames) {
     }
 }
 
+/**
+ * Removes the specified CSS properties from an element's inline styles.
+ * If no inline styles remain afterward, the `style` attribute is removed.
+ *
+ * @param {Element} element
+ * @param {...string} styleProperties
+ */
 export function removeStyle(element, ...styleProperties) {
-    const propsToRemoveSet = new Set(styleProperties);
-    if ([...element.style].every((prop) => propsToRemoveSet.has(prop))) {
+    styleProperties.forEach((prop) => element.style.removeProperty(prop));
+    if (element.getAttribute("style") === "") {
         element.removeAttribute("style");
-    } else {
-        styleProperties.forEach((prop) => element.style.removeProperty(prop));
     }
 }
 
@@ -206,7 +211,8 @@ export function fillShrunkPhrasingParent(el) {
 /**
  * Removes a trailing BR if it is unnecessary:
  * in a non-empty block, if the last childNode is a BR and its previous sibling
- * is not a BR, remove the BR.
+ * is not a BR, remove the BR. A BR at the end of an inline `el` with some
+ * content after that inline in its block is a real line break, so it is kept.
  *
  * @param {HTMLElement} el
  * @param {Array} predicates exceptions where a trailing BR should not be removed
@@ -218,6 +224,7 @@ export function cleanTrailingBR(el, predicates = []) {
         candidate?.nodeName === "BR" &&
         candidate.previousSibling?.nodeName !== "BR" &&
         !isEmptyBlock(el) &&
+        !nextLeaf(candidate, closestBlock(el), true) &&
         !predicates.some((predicate) => predicate(candidate))
     ) {
         candidate.remove();
@@ -352,9 +359,11 @@ export function splitTextNode(textNode, offset, originalNodeSide = DIRECTIONS.RI
  * @param {import("@html_editor/core/selection_plugin").Cursors} [cursors]
  */
 export function removeInvisibleWhitespace(el, cursors) {
-    const [countLeadingWhitespace, countTrailingWhitespace] = [/^\s+/, /\s+$/].map(
-        (regex) => (node) => node?.textContent.match(regex)?.[0]?.length || 0
-    );
+    const whitespaceRegex = /[^\S\u00A0\uFEFF]/;
+    const [countLeadingWhitespace, countTrailingWhitespace] = [
+        new RegExp(`^${whitespaceRegex.source}+`),
+        new RegExp(`${whitespaceRegex.source}+$`),
+    ].map((regex) => (node) => node?.textContent.match(regex)?.[0]?.length || 0);
     const isInlineElement = (node) => node?.nodeType === Node.ELEMENT_NODE && !isBlock(node);
     const textChildren = descendants(el).filter((child) => child.nodeType === Node.TEXT_NODE);
     let removedTrailingSpaceBefore = false;
@@ -386,8 +395,8 @@ export function removeInvisibleWhitespace(el, cursors) {
                 leadingWhitespace,
                 child.textContent.length - trailingWhitespace || leadingWhitespace
             )
-            .replace(/^\s+/, " ")
-            .replace(/\s+$/, " ");
+            .replace(new RegExp(`^${whitespaceRegex.source}+`), " ")
+            .replace(new RegExp(`${whitespaceRegex.source}+$`), " ");
         if (!child.textContent) {
             child.remove();
         }

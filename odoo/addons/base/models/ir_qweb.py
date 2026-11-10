@@ -406,7 +406,7 @@ from odoo.tools.profiler import ExecutionContext
 from odoo.tools.translate import FORMAT_REGEX
 from odoo.http import request
 from odoo.tools.profiler import QwebTracker
-from odoo.exceptions import UserError, MissingError
+from odoo.exceptions import UserError
 
 from odoo.addons.base.models.assetsbundle import AssetsBundle
 from odoo.tools.constants import SCRIPT_EXTENSIONS, STYLE_EXTENSIONS, TEMPLATE_EXTENSIONS
@@ -461,6 +461,7 @@ _SAFE_QWEB_OPCODES = _EXPR_OPCODES.union(to_opcodes([
     # 3.14 c.f. safe_eval
     'LOAD_FAST_BORROW', 'LOAD_FAST_BORROW_LOAD_FAST_BORROW',
     'POP_ITER', 'LOAD_COMMON_CONSTANT', 'NOT_TAKEN',
+    'JUMP_BACKWARD_NO_INTERRUPT',
 ])) - _BLACKLIST
 
 
@@ -616,12 +617,22 @@ class QwebContent:
     params__: QwebCallParameters  # not available for the python expression inside the xml
 
     def __init__(self, irQweb: IrQweb, params: QwebCallParameters):
-        self.irQweb = irQweb
+        self.__irQweb = irQweb
         self.html = None
         self.params__ = params
 
+    @property
+    def irQweb(self):
+        irQweb = self.__irQweb
+        thread_dbname = getattr(threading.current_thread(), 'dbname', None)
+        if thread_dbname and thread_dbname != irQweb.env.cr.dbname:
+            return None
+        return irQweb
+
     def __str__(self):
         if self.html is None:
+            if self.irQweb is None:
+                return ''
             params = self.params__
             self.html = ''.join(self.irQweb._render_iterall(
                params.view_ref, params.method, params.values, params.directive,
@@ -1126,7 +1137,8 @@ class IrQweb(models.AbstractModel):
                 """, 0)]
 
         code_lines = []
-        code_lines.append(f'template_options = {pprint.pformat(options, indent=4)}')
+        json_options = json.scriptsafe.loads(json.scriptsafe.dumps(options, default=str))
+        code_lines.append(f'template_options = {pprint.pformat(json_options, indent=4)}')
         code_lines.append('code = None')
         code_lines.append('template_functions = {}')
 
@@ -1179,10 +1191,11 @@ class IrQweb(models.AbstractModel):
         id_or_xmlid = _id_or_xmlid(template)  # e.g. <t t-call="33"/> or <t t-call="web.layout"/>
         value = self._preload_trees([id_or_xmlid]).get(id_or_xmlid)
         if value.get('error'):
-            raise value['error']
+            self.env['ir.ui.view']._raise_error(value['error'])
 
-        # In dev mode `_generate_code_cached` is not cached and the tree can be processed several times
-        value_tree = deepcopy(value['tree']) if 'xml' in tools.config['dev_mode'] else value['tree']
+        # The compiled template cache can evict entries during a render, causing
+        # the same preloaded tree to be processed several times.
+        value_tree = deepcopy(value['tree'])
         # return etree, document and ref
         return (value_tree, value['template'], value['ref'])
 
@@ -1247,7 +1260,7 @@ class IrQweb(models.AbstractModel):
                 compile_batch[ref] = {
                     'xmlid': ref,
                     'ref': ref,
-                    'error': MissingError(self.env._("External ID can not be loaded: %s", ref)),
+                    'error': ('missing_external', ref),
                 }
 
         return compile_batch
